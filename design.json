@@ -1,0 +1,444 @@
+{
+  "designSystem": {
+    "name": "Learny",
+    "version": "1.0.0",
+    "description": "A playful, bold language-learning app design system. Combines high-energy typography with a warm neutral base, cartoon-style illustration elements, and punchy red accents. Tone is friendly, energetic, and accessible — like a children's book meets a modern SaaS landing page.",
+    "aestheticProfile": {
+      "style": "Playful Modernism",
+      "tone": "Energetic, approachable, child-friendly but not babyish",
+      "mood": "Encouraging, fun, motivating",
+      "influences": [
+        "Cartoon illustration aesthetics",
+        "Bold editorial typography",
+        "Flat design with soft rounded shapes",
+        "Duolingo-adjacent edtech playfulness"
+      ],
+      "keyDesignPrinciples": [
+        "Large, expressive display type as a hero element",
+        "Mascot/character-driven brand identity",
+        "Soft warm backgrounds with white card surfaces",
+        "One dominant accent color used boldly and sparingly",
+        "Rounded corners throughout all UI elements",
+        "Flat color illustration with no gradients",
+        "Generous whitespace with deliberate density in hero sections"
+      ]
+    },
+    "typography": {
+      "fontFamilies": {
+        "display": {
+          "name": "Vina Sans",
+          "source": "Google Fonts",
+          "importUrl": "https://fonts.google.com/specimen/Vina+Sans",
+          "characteristics": "Condensed, ultra-bold, all-caps capable, very high visual impact",
+          "usage": "Hero headings, section titles, large decorative text"
+        },
+        "body": {
+          "name": "System sans-serif (clean, geometric)",
+          "fallback": "system-ui, -apple-system, sans-serif",
+          "characteristics": "Clean, readable, low visual weight to contrast the display font",
+          "usage": "Body copy, nav links, card text, CTA labels, UI elements"
+        }
+      },
+      "scale": {
+        "heroHeading": {
+          "fontSize": "clamp(4rem, 10vw, 9rem)",
+          "fontFamily": "display",
+          "fontWeight": 900,
+          "letterSpacing": "-0.01em",
+          "lineHeight": 0.9,
+          "textTransform": "uppercase",
+          "color": "var(--color-accent)"
+        },
+        "sectionHeading": {
+          "fontSize": "clamp(2rem, 4vw, 3.5rem)",
+          "fontFamily": "display",
+          "fontWeight": 900,
+          "textTransform": "uppercase",
+          "color": "var(--color-dark)"
+        },
+        "cardTitle": {
+          "fontSize": "1.25rem",
+          "fontFamily": "body",
+          "fontWeight": 700,
+          "color": "var(--color-dark)"
+        },
+        "body": {
+          "fontSize": "1rem",
+          "fontFamily": "body",
+          "fontWeight": 400,
+          "lineHeight": 1.6,
+          "color": "var(--color-dark)"
+        },
+        "navLinks": {
+          "fontSize": "0.875rem",
+          "fontFamily": "body",
+          "fontWeight": 500,
+          "textTransform": "none",
+          "color": "var(--color-dark)"
+        },
+        "label": {
+          "fontSize": "0.75rem",
+          "fontFamily": "body",
+          "fontWeight": 600,
+          "color": "var(--color-dark)"
+        }
+      }
+    },
+    "colorPalette": {
+      "tokens": {
+        "dark": {
+          "hex": "#161616",
+          "usage": "Primary text, logo background pill, dark CTAs, card text"
+        },
+        "accent": {
+          "hex": "#f43651",
+          "usage": "Hero headlines, primary CTA buttons, active states, bold highlights"
+        },
+        "background": {
+          "hex": "#e7e7d8",
+          "usage": "Page and section background — warm off-white/sage tint"
+        },
+        "surface": {
+          "hex": "#f2f2f2",
+          "usage": "Cards, modals, floating elements, nav background"
+        },
+        "white": {
+          "hex": "#ffffff",
+          "usage": "Speech bubbles, inner card fills, button text"
+        }
+      },
+      "semanticRoles": {
+        "pageBackground": "background (#e7e7d8)",
+        "cardBackground": "surface (#f2f2f2)",
+        "primaryText": "dark (#161616)",
+        "headlineText": "accent (#f43651)",
+        "primaryButton": "dark (#161616)",
+        "primaryButtonText": "white (#ffffff)",
+        "accentButton": "accent (#f43651)",
+        "accentButtonText": "white (#ffffff)",
+        "navBackground": "surface (#f2f2f2)",
+        "illustrationBase": "accent (#f43651)",
+        "illustrationSecondary": "background (#e7e7d8)"
+      },
+      "colorUsageRules": [
+        "Accent (#f43651) is ONLY used for display headings, key CTAs, and critical highlights — never for body text",
+        "Background (#e7e7d8) always feels warm, never pure white or pure grey",
+        "Cards float on the background using #f2f2f2 with no border — separation is purely tonal",
+        "Dark (#161616) is the anchor; black buttons are preferred over colored ones in secondary contexts",
+        "The only exception to the palette is the app-download banner section which uses a vibrant blue (#3b82f6) to create a strong visual break"
+      ]
+    },
+    "spacing": {
+      "baseUnit": 8,
+      "scale": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "16px",
+        "lg": "24px",
+        "xl": "40px",
+        "2xl": "64px",
+        "3xl": "96px",
+        "section": "120px"
+      },
+      "sectionPadding": {
+        "vertical": "80px to 120px",
+        "horizontal": "clamp(24px, 6vw, 120px)"
+      }
+    },
+    "borderRadius": {
+      "sm": "8px",
+      "md": "12px",
+      "lg": "20px",
+      "xl": "32px",
+      "pill": "999px",
+      "card": "20px",
+      "button": "12px",
+      "badge": "999px",
+      "logoPill": "999px",
+      "illustrationCard": "20px"
+    },
+    "shadows": {
+      "card": "0 4px 24px rgba(0,0,0,0.07)",
+      "cardHover": "0 8px 32px rgba(0,0,0,0.12)",
+      "button": "none",
+      "floating": "0 8px 40px rgba(0,0,0,0.10)"
+    },
+    "components": {
+      "navbar": {
+        "description": "Minimal nav, horizontally centered links, logo pill on left, CTA on right",
+        "background": "surface (#f2f2f2)",
+        "height": "60–72px",
+        "layout": "flex, space-between, with centered nav links",
+        "logo": {
+          "style": "Word mark in a rounded pill shape",
+          "background": "dark (#161616)",
+          "color": "white",
+          "fontWeight": 700,
+          "padding": "6px 14px",
+          "borderRadius": "pill (999px)"
+        },
+        "navLinks": {
+          "style": "Minimal text links, no underlines",
+          "color": "dark",
+          "gap": "32px"
+        },
+        "cta": {
+          "label": "Get Started",
+          "style": "Pill button",
+          "background": "accent (#f43651)",
+          "color": "white",
+          "padding": "8px 20px",
+          "borderRadius": "pill"
+        }
+      },
+      "heroSection": {
+        "description": "Full-bleed section with enormous stacked display type on the left, a central mascot illustration, and a speech bubble to the right",
+        "background": "background (#e7e7d8)",
+        "layout": "Overlapping layers — text left, illustration center-bottom, speech bubble top-right",
+        "headingStyle": "Multi-line stacked uppercase display font in accent color, massive scale, line-height ~0.9",
+        "heroSubtext": {
+          "fontSize": "1rem",
+          "color": "dark",
+          "maxWidth": "300px",
+          "placement": "Below the hero heading, left-aligned"
+        },
+        "speechBubble": {
+          "shape": "Cloud or thought bubble with irregular bumps at the base",
+          "background": "white",
+          "textStyle": "Regular body weight, centered",
+          "placement": "Top-right quadrant, overlapping the mascot illustration"
+        },
+        "decorativeElements": {
+          "type": "4-pointed star / asterisk shapes",
+          "style": "Flat filled, muted grey (#aaaaaa to #cccccc), scattered asymmetrically",
+          "sizes": "Vary between 24px and 60px"
+        },
+        "ctaButton": {
+          "style": "Dark pill button below subtext",
+          "background": "dark (#161616)",
+          "color": "white",
+          "padding": "14px 28px",
+          "borderRadius": "pill"
+        }
+      },
+      "languagePickerSection": {
+        "description": "Section showing popular languages as circular flag indicators in a floating pill, with scattered vocabulary cards below",
+        "sectionLabel": "Small uppercase label above the heading (e.g. '100+ languages')",
+        "heading": "sectionHeading style — all caps, bold, dark color",
+        "flagPicker": {
+          "style": "Horizontal pill container with circular flag icons",
+          "background": "white",
+          "borderRadius": "pill",
+          "padding": "8px 16px",
+          "flagSize": "24–28px circles",
+          "gap": "8px",
+          "shadow": "card"
+        },
+        "vocabularyCards": {
+          "layout": "Staggered horizontal row, 4 cards, slightly offset vertically",
+          "cardSize": "Approx 140x140px",
+          "background": "Soft pastel variants: light blue, light pink, light purple, light peach",
+          "borderRadius": "card (20px)",
+          "label": {
+            "style": "Floating white pill above or on the card",
+            "background": "white",
+            "borderRadius": "pill",
+            "fontSize": "0.75rem",
+            "padding": "4px 10px"
+          },
+          "illustration": "Flat object icon, centered, no outline shadow"
+        }
+      },
+      "benefitsSection": {
+        "description": "3-column card grid showing app benefits with icon, title, body, and learn more CTA",
+        "sectionHeading": "Centered, display font, accent color or dark",
+        "cardLayout": "3-column grid, equal width, generous internal padding",
+        "card": {
+          "background": "white",
+          "borderRadius": "card (20px)",
+          "shadow": "card",
+          "padding": "32px",
+          "iconContainer": {
+            "size": "64px",
+            "borderRadius": "xl (32px)",
+            "backgroundVariants": [
+              "light blue (#dbeafe) for experts card",
+              "light pink (#fce7f3) for tasks card",
+              "light purple (#ede9fe) for certification card"
+            ],
+            "iconColor": "Matching mid-saturation tone of the container tint"
+          },
+          "title": "cardTitle — 700 weight, dark color",
+          "body": "body — 400 weight, muted dark, 2–3 lines",
+          "cta": {
+            "label": "Learn more",
+            "style": "Full-width dark rounded button at card bottom",
+            "background": "dark (#161616)",
+            "color": "white",
+            "borderRadius": "md (12px)",
+            "fontSize": "0.875rem",
+            "padding": "12px"
+          }
+        }
+      },
+      "ctaBannerSection": {
+        "description": "Full-bleed app download section with bold headline, CTA, and device mockup cluster",
+        "background": "#3b82f6 (vivid blue — intentional palette break for energy)",
+        "headlineColor": "white",
+        "headingStyle": "display font, uppercase, white, left-aligned",
+        "ctaButton": {
+          "label": "Get Started",
+          "style": "White pill button",
+          "background": "white",
+          "color": "dark (#161616)",
+          "borderRadius": "pill",
+          "padding": "12px 28px"
+        },
+        "cloudDecoration": {
+          "style": "Large white cloud blob shape behind device frames",
+          "opacity": 0.2
+        },
+        "deviceMockups": {
+          "count": 3,
+          "layout": "Overlapping, center phone is larger/front, side phones slightly smaller and angled",
+          "frameStyle": "Modern rounded smartphone frame"
+        }
+      },
+      "buttons": {
+        "primary": {
+          "background": "dark (#161616)",
+          "color": "white",
+          "padding": "12px 28px",
+          "borderRadius": "pill",
+          "fontWeight": 600,
+          "fontSize": "0.9rem",
+          "border": "none"
+        },
+        "accent": {
+          "background": "accent (#f43651)",
+          "color": "white",
+          "padding": "10px 22px",
+          "borderRadius": "pill",
+          "fontWeight": 600,
+          "border": "none"
+        },
+        "ghost": {
+          "background": "transparent",
+          "color": "dark (#161616)",
+          "border": "1.5px solid #161616",
+          "padding": "10px 22px",
+          "borderRadius": "pill"
+        }
+      }
+    },
+    "illustration": {
+      "style": "Flat vector cartoon — no gradients, bold outlines on character figures, simplified geometry for objects",
+      "characterDesign": {
+        "type": "Anthropomorphic animal mascot (rabbit)",
+        "clothing": "Dark dungarees/overalls over a pink shirt",
+        "expression": "Simple and friendly — dot eyes, small upward mouth",
+        "outlineWeight": "2–3px solid dark stroke on character edges",
+        "bodyColors": {
+          "skin": "White/off-white",
+          "clothing": "#161616 (dark) for overalls",
+          "accents": "#f43651 (accent) for shirt"
+        }
+      },
+      "objectIllustrations": {
+        "style": "Flat, single-tone objects with no gradients",
+        "background": "Placed on pastel card surfaces",
+        "exampleObjects": ["vinyl record", "shopping bag", "sneaker/boot", "cake/food"]
+      },
+      "decorativeShapes": {
+        "type": "4-pointed stars and asterisks",
+        "fill": "#aaaaaa to #bbbbbb",
+        "usage": "Scattered asymmetrically around mascot in hero, adds rhythm and movement",
+        "sizesRange": "24px – 60px"
+      }
+    },
+    "layout": {
+      "maxWidth": "1280px",
+      "containerPadding": "clamp(24px, 6vw, 120px)",
+      "gridSystem": "12-column CSS Grid",
+      "breakpoints": {
+        "sm": "480px",
+        "md": "768px",
+        "lg": "1024px",
+        "xl": "1280px"
+      },
+      "sectionStructure": [
+        {
+          "id": "hero",
+          "type": "Full-width, overlapping layers",
+          "background": "background"
+        },
+        {
+          "id": "language-picker",
+          "type": "Contained, scattered card grid",
+          "background": "background"
+        },
+        {
+          "id": "benefits",
+          "type": "Centered 3-col card grid",
+          "background": "background"
+        },
+        {
+          "id": "cta-banner",
+          "type": "Full-bleed contrasting color",
+          "background": "#3b82f6"
+        }
+      ]
+    },
+    "motion": {
+      "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      "durationFast": "150ms",
+      "durationDefault": "250ms",
+      "durationSlow": "400ms",
+      "interactions": {
+        "cardHover": "translateY(-4px) + shadow increase",
+        "buttonHover": "scale(1.03) or brightness(1.05)",
+        "mascotEntrance": "fade-in + translateY(20px to 0) over 500ms"
+      }
+    },
+    "iconography": {
+      "style": "Rounded, filled or soft-stroke icons",
+      "containerSize": "64px with colored pill/rounded background",
+      "iconSize": "28–32px",
+      "weight": "Medium stroke or filled",
+      "recommendedSources": ["Phosphor Icons", "Lucide", "Heroicons (rounded variant)"]
+    },
+    "writingStyle": {
+      "heroHeading": "Imperative verb phrase OR emotional benefit — ALL CAPS display font, split across 2–3 lines",
+      "sectionHeading": "Short declarative benefit statement in ALL CAPS",
+      "subheading": "1–2 sentence friendly elaboration, sentence case",
+      "ctaText": "Action-first short verbs: 'Get Started', 'Learn More', 'Download Now'",
+      "cardBody": "Concise 2–3 sentences. Warm, second-person. Focus on benefit not feature."
+    },
+    "cssVariables": {
+      "_comment": "Paste inside :root {} in your global stylesheet",
+      "--color-dark": "#161616",
+      "--color-accent": "#f43651",
+      "--color-background": "#e7e7d8",
+      "--color-surface": "#f2f2f2",
+      "--color-white": "#ffffff",
+      "--color-blue-cta": "#3b82f6",
+      "--font-display": "'Vina Sans', sans-serif",
+      "--font-body": "system-ui, -apple-system, sans-serif",
+      "--radius-sm": "8px",
+      "--radius-md": "12px",
+      "--radius-lg": "20px",
+      "--radius-xl": "32px",
+      "--radius-pill": "999px",
+      "--shadow-card": "0 4px 24px rgba(0,0,0,0.07)",
+      "--shadow-card-hover": "0 8px 32px rgba(0,0,0,0.12)",
+      "--shadow-floating": "0 8px 40px rgba(0,0,0,0.10)",
+      "--spacing-xs": "4px",
+      "--spacing-sm": "8px",
+      "--spacing-md": "16px",
+      "--spacing-lg": "24px",
+      "--spacing-xl": "40px",
+      "--spacing-2xl": "64px",
+      "--spacing-section": "96px"
+    }
+  }
+}

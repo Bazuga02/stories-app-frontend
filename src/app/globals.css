@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
+/* Single source of truth: mirrors design.json → designSystem.cssVariables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-dark: #161616;
+  --color-accent: #f43651;
+  --color-background: #e7e7d8;
+  --color-surface: #f2f2f2;
+  --color-white: #ffffff;
+  --color-blue-cta: #3b82f6;
+  --color-muted: #6b6b6b;
+  --font-display: var(--font-vina), "Vina Sans", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-floating: 0 8px 40px rgba(0, 0, 0, 0.1);
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 64px;
+  --spacing-section: 96px;
+  --motion-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --motion-fast: 150ms;
+  --motion-default: 250ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-dark: var(--color-dark);
+  --color-accent: var(--color-accent);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-white: var(--color-white);
+  --color-blue-cta: var(--color-blue-cta);
+  --color-muted: var(--color-muted);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+  --shadow-floating: var(--shadow-floating);
+  --spacing-design-xs: var(--spacing-xs);
+  --spacing-design-sm: var(--spacing-sm);
+  --spacing-design-md: var(--spacing-md);
+  --spacing-design-lg: var(--spacing-lg);
+  --spacing-design-xl: var(--spacing-xl);
+  --spacing-design-2xl: var(--spacing-2xl);
+  --spacing-design-section: var(--spacing-section);
+  --max-w-content: 1280px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-dark);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.text-hero-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 900;
+  /* Slight positive tracking so condensed glyphs don’t collide */
+  letter-spacing: clamp(0.02em, 0.15vw, 0.06em);
+  /* Condensed display fonts need extra space between words */
+  word-spacing: clamp(0.08em, 0.35vw, 0.2em);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.text-section-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 900;
+  letter-spacing: clamp(0.015em, 0.12vw, 0.05em);
+  word-spacing: clamp(0.06em, 0.3vw, 0.14em);
+  text-transform: uppercase;
+  color: var(--color-dark);
+}
+
+.text-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.text-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.container-design {
+  width: 100%;
+  max-width: var(--max-w-content, 1280px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(24px, 6vw, 120px);
+  padding-right: clamp(24px, 6vw, 120px);
 }
