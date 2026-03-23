@@ -5,14 +5,16 @@ import Lottie from "lottie-react";
 
 type Props = {
   className?: string;
+  src?: string;
 };
 
-export function HomeHeroLottie({ className }: Props) {
+export function HomeHeroLottie({ className, src = "/STUDENT.json" }: Props) {
   const [data, setData] = useState<object | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/STUDENT.json")
+    setData(null);
+    fetch(src)
       .then((r) => r.json())
       .then((json) => {
         if (!cancelled) setData(json);
@@ -21,7 +23,7 @@ export function HomeHeroLottie({ className }: Props) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [src]);
 
   if (!data) {
     return (

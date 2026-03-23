@@ -73,8 +73,8 @@ export function Navbar() {
             >
               <BookOpen className="size-[1.15rem]" strokeWidth={2.25} />
             </span>
-            <span className="font-display text-[1.1rem] font-black uppercase tracking-[0.06em] text-dark">
-              Stories
+            <span className="font-hero text-[1.1rem] font-bold tracking-[0.03em] text-dark">
+              STORIES
             </span>
           </Link>
 

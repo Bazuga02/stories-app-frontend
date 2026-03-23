@@ -27,7 +27,7 @@ export default function HomePage() {
       </section>
       <section className="flex-1">
         <div className="container-design">
-          <h2 className="text-section-heading mb-[var(--spacing-lg)] pt-[var(--spacing-xl)]">
+          <h2 className="text-section-heading font-hero mb-[var(--spacing-lg)] pt-[var(--spacing-xl)]">
             Latest stories
           </h2>
         </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Vina_Sans } from "next/font/google";
+import { B612, Vina_Sans } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
 import { Navbar } from "@/components/ui/navbar";
@@ -8,6 +8,14 @@ const vinaSans = Vina_Sans({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-vina",
+  display: "swap",
+});
+
+const b612 = B612({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-b612",
   display: "swap",
 });
 
@@ -24,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${vinaSans.variable} h-full antialiased`}
+      className={`${vinaSans.variable} ${b612.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
