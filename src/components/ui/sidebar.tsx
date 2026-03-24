@@ -46,7 +46,7 @@ export function Sidebar({ className }: { className?: string }) {
             <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-accent">
               Workspace
             </p>
-            <p className="font-display text-[0.95rem] font-black uppercase tracking-wide text-dark">
+            <p className=" text-[0.95rem] font-black uppercase tracking-wide text-dark">
               Your desk
             </p>
           </div>

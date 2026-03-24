@@ -53,6 +53,23 @@ export interface AdminStats {
   totalComments?: number;
 }
 
+/** Admin moderation list row (GET /admin/stories) */
+export interface AdminStoryRow {
+  id: string;
+  title: string;
+  preview: string;
+  authorName: string;
+}
+
+/** Admin moderation list row (GET /admin/comments) */
+export interface AdminCommentRow {
+  id: string;
+  content: string;
+  authorName: string;
+  storyId: string;
+  storyTitle: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
@@ -64,4 +81,9 @@ export interface ApiErrorBody {
   details?: string[] | Record<string, unknown>;
   error?: string;
   statusCode?: number;
+}
+
+export interface NarrateResponse {
+  audioBase64: string;
+  contentType: string;
 }

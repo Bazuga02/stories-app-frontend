@@ -1,8 +1,24 @@
 import { api } from "./api";
-import type { AdminStats, Story, User } from "@/types";
+import type {
+  AdminCommentRow,
+  AdminStats,
+  AdminStoryRow,
+  Story,
+  User,
+} from "@/types";
 
 export async function listAllUsers() {
   const { data } = await api.get<User[]>("/admin/users");
+  return data;
+}
+
+export async function listAdminStories() {
+  const { data } = await api.get<AdminStoryRow[]>("/admin/stories");
+  return data;
+}
+
+export async function listAdminComments() {
+  const { data } = await api.get<AdminCommentRow[]>("/admin/comments");
   return data;
 }
 
