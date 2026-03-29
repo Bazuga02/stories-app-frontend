@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { StoryMarkdown } from "@/components/editor/StoryMarkdown";
@@ -9,7 +10,7 @@ import {
   aesopStoryId,
   type AesopStory,
 } from "@/services/aesop-stories.service";
-import { titleWithAccent, userInitial } from "./story-page-utils";
+import { titleWithAccent } from "./story-page-utils";
 
 type AesopStoryViewProps = {
   aesopStory: AesopStory;
@@ -34,11 +35,16 @@ export function AesopStoryView({ aesopStory, relatedAesop }: AesopStoryViewProps
             {titleWithAccent(aesopStory.title || "Untitled")}
           </h1>
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <div
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-4 border-surface-container-lowest bg-primary/15 font-headline text-xl font-bold text-primary"
-              aria-hidden
-            >
-              {userInitial(aesopAuthor)}
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-4 border-surface-container-lowest bg-primary/15">
+              <Image
+                src="/aesop.png"
+                alt={`Portrait for ${aesopAuthor}`}
+                width={56}
+                height={56}
+                className="size-full object-cover object-center"
+                sizes="56px"
+                priority
+              />
             </div>
             <div>
               <p className="text-lg font-bold text-on-background">{aesopAuthor}</p>
@@ -51,14 +57,27 @@ export function AesopStoryView({ aesopStory, relatedAesop }: AesopStoryViewProps
       <article className="min-w-0">
         <StoryMarkdown source={aesopStory.story} variant="editorial" />
         {aesopStory.moral ? (
-          <blockquote className="mt-12 rounded-2xl border-l-4 border-primary bg-surface-container-low p-6 text-on-surface-variant">
-            <p className="font-headline mb-2 text-xs font-bold uppercase tracking-widest text-primary not-italic">
-              Moral
-            </p>
-            <p className="leading-relaxed">{aesopStory.moral}</p>
-          </blockquote>
+          <aside className="mt-8 scroll-mt-20" aria-labelledby="story-moral-label">
+            <div className="flex gap-3 rounded-lg border border-outline-variant/25 bg-surface-container-low px-3.5 py-3 sm:px-4 sm:py-3.5">
+              <div
+                className="mt-0.5 w-0.5 shrink-0 self-stretch rounded-full bg-primary"
+                aria-hidden
+              />
+              <blockquote className="min-w-0 flex-1 border-none p-0">
+                <p
+                  id="story-moral-label"
+                  className="font-headline text-[10px] font-bold uppercase tracking-widest text-primary"
+                >
+                  Moral
+                </p>
+                <p className="font-headline mt-1 text-sm leading-snug text-on-background italic sm:text-base sm:leading-relaxed">
+                  {aesopStory.moral}
+                </p>
+              </blockquote>
+            </div>
+          </aside>
         ) : null}
-        <div className="mt-12 flex flex-wrap gap-3 border-t border-outline-variant/10 pt-8">
+        <div className="mt-8 flex flex-wrap gap-3 border-t border-outline-variant/10 pt-6">
           <span className="rounded-full bg-surface-container-highest px-4 py-2 text-sm font-bold">
             #Fable
           </span>
@@ -68,8 +87,8 @@ export function AesopStoryView({ aesopStory, relatedAesop }: AesopStoryViewProps
         </div>
       </article>
 
-      <section className="mt-24 border-t border-outline-variant/10 pt-16">
-        <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+      <section className="mt-10 border-t border-outline-variant/10 pt-8">
+        <div className="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div>
             <h4 className="font-headline text-4xl font-black text-on-background">
               More <span className="text-primary">fables</span>
