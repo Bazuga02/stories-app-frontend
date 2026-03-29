@@ -47,38 +47,38 @@ export function EditorialHome() {
   return (
     <>
       {/* Hero */}
-      <section className="relative mx-auto max-w-7xl overflow-hidden px-6 pt-14 pb-20 sm:px-8 sm:pt-16 sm:pb-24 md:pb-28">
-        <div className="absolute top-8 left-6 text-primary opacity-40 animate-pulse sm:top-10 sm:left-10">
-          <Star aria-hidden className="size-12 fill-primary sm:size-14" strokeWidth={0} />
+      <section className="relative mx-auto max-w-7xl overflow-hidden px-6 pt-8 pb-12 sm:px-8 sm:pt-10 sm:pb-14 md:pb-16">
+        <div className="absolute top-5 left-5 text-primary opacity-40 animate-pulse sm:top-6 sm:left-7">
+          <Star aria-hidden className="size-9 fill-primary sm:size-10" strokeWidth={0} />
         </div>
-        <div className="absolute right-6 bottom-16 text-tertiary-container opacity-30 sm:right-10 sm:bottom-20">
-          <Star aria-hidden className="size-16 fill-tertiary-container sm:size-20" strokeWidth={0} />
+        <div className="absolute right-5 bottom-10 text-tertiary-container opacity-30 sm:right-8 sm:bottom-12">
+          <Star aria-hidden className="size-12 fill-tertiary-container sm:size-14" strokeWidth={0} />
         </div>
 
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-10">
           <div className="relative z-10">
-            <span className="font-login-label mb-5 inline-block rounded-full bg-primary-fixed px-4 py-1 text-sm font-bold tracking-widest text-on-primary-fixed uppercase sm:mb-6">
+            <span className="font-login-label mb-3 inline-block rounded-full bg-primary-fixed px-3 py-0.5 text-xs font-bold tracking-widest text-on-primary-fixed uppercase sm:mb-3.5 sm:px-3.5 sm:text-[0.8rem]">
               Editorial Choice
             </span>
-            <h1 className="font-headline text-5xl leading-[0.9] font-black tracking-tighter text-on-surface sm:text-6xl md:text-7xl lg:text-8xl">
+            <h1 className="font-headline text-4xl leading-[0.92] font-black tracking-tighter text-on-surface sm:text-5xl md:text-6xl lg:text-7xl">
               IMPROVE <br /> YOUR <br />{" "}
               <span className="text-primary italic">IMAGINATION</span>
             </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-on-surface-variant sm:mt-8 sm:text-xl">
+            <p className="mt-4 max-w-md text-base leading-relaxed text-on-surface-variant sm:mt-5 sm:text-lg">
               Dive into curated narratives that spark creativity. From surreal fables to modern
               chronicles, every story is a journey into the unexpected.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3 sm:mt-10 sm:gap-4">
+            <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
               <Link
                 href="/#short-stories"
-                className="inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-base font-bold text-on-primary shadow-2xl shadow-primary/20 transition-transform hover:scale-105 sm:px-10 sm:py-5 sm:text-lg"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-on-primary shadow-xl shadow-primary/15 transition-transform hover:scale-[1.02] sm:px-7 sm:py-3.5 sm:text-base"
               >
-                <BookOpen className="size-5 shrink-0 sm:size-6" strokeWidth={2} />
+                <BookOpen className="size-4 shrink-0 sm:size-5" strokeWidth={2} />
                 Start Reading
               </Link>
               <Link
                 href="/#short-stories"
-                className="rounded-full bg-surface-container-highest px-8 py-4 text-base font-bold text-on-surface transition-colors hover:bg-surface-container-high sm:px-10 sm:py-5 sm:text-lg"
+                className="rounded-full bg-surface-container-highest px-6 py-3 text-sm font-bold text-on-surface transition-colors hover:bg-surface-container-high sm:px-7 sm:py-3.5 sm:text-base"
               >
                 Explore Library
               </Link>
@@ -86,25 +86,25 @@ export function EditorialHome() {
           </div>
 
           <div className="relative">
-            <div className="cloud-shape relative flex aspect-square w-full items-center justify-center overflow-hidden bg-surface-container-lowest p-2 shadow-2xl shadow-on-surface/5 sm:p-4">
+            <div className="cloud-shape relative flex aspect-square w-full max-w-lg mx-auto lg:max-w-none items-center justify-center overflow-hidden bg-surface-container-lowest p-1.5 shadow-2xl shadow-on-surface/5 sm:p-3">
               <Lottie
                 animationData={heroAnimation}
                 loop
-                className="h-full w-full max-h-[min(100%,92vw)] scale-100 sm:max-h-none [&>svg]:h-full [&>svg]:max-h-full [&>svg]:w-full [&>svg]:object-contain"
+                className="h-full w-full max-h-[min(72vw,340px)] scale-100 sm:max-h-[min(56vw,420px)] lg:max-h-none [&>svg]:h-full [&>svg]:max-h-full [&>svg]:w-full [&>svg]:object-contain"
                 aria-label="Animated illustration for the Stories hero"
               />
-              <div className="pointer-events-none absolute top-3 right-3 rounded-full bg-primary p-3 text-on-primary sm:top-4 sm:right-4 sm:p-4">
-                <Sparkles className="size-7 sm:size-8" strokeWidth={1.75} />
+              <div className="pointer-events-none absolute top-2 right-2 rounded-full bg-primary p-2 text-on-primary sm:top-3 sm:right-3 sm:p-2.5">
+                <Sparkles className="size-6 sm:size-7" strokeWidth={1.75} />
               </div>
             </div>
-            <div className="absolute -bottom-4 -left-4 hidden rounded-editorial-xl bg-tertiary-fixed-dim p-6 shadow-xl md:block md:p-8">
-              <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-on-tertiary-fixed text-on-tertiary">
-                  <Mic className="size-5" strokeWidth={2} />
+            <div className="absolute -bottom-3 -left-3 hidden rounded-editorial-xl bg-tertiary-fixed-dim p-4 shadow-xl md:block md:p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-on-tertiary-fixed text-on-tertiary">
+                  <Mic className="size-4" strokeWidth={2} />
                 </div>
                 <div>
-                  <p className="font-bold text-on-tertiary-fixed">Now Listening</p>
-                  <p className="text-sm opacity-70">The Glass Library — 12 min</p>
+                  <p className="text-sm font-bold text-on-tertiary-fixed">Now Listening</p>
+                  <p className="text-xs opacity-70">The Glass Library — 12 min</p>
                 </div>
               </div>
             </div>

@@ -18,15 +18,24 @@ export default function HomePage() {
                 Fresh voices from the community—hand-picked from the public feed.
               </p>
             </div>
-            <Link
-              href="/#short-stories"
-              className="flex shrink-0 items-center gap-2 self-start border-b-2 border-primary pb-1 font-headline text-sm font-bold text-primary sm:text-base md:self-auto"
-            >
-              Aesop fables
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
+            <div className="flex shrink-0 flex-col gap-3 self-start sm:flex-row sm:items-center sm:gap-6 md:self-auto">
+              <Link
+                href="/stories"
+                className="flex items-center gap-2 border-b-2 border-primary pb-1 font-headline text-sm font-bold text-primary sm:text-base"
+              >
+                View all stories
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+              <Link
+                href="/#short-stories"
+                className="flex items-center gap-2 border-b-2 border-transparent pb-1 font-headline text-sm font-bold text-on-surface opacity-80 transition-colors hover:border-primary hover:text-primary sm:text-base"
+              >
+                Aesop fables
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            </div>
           </div>
-          <HomeFeed />
+          <HomeFeed compact />
         </div>
       </section>
     </div>

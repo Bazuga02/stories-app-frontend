@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
+  ArrowRight,
   Bookmark,
   Clock,
   Heart,
   MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
-import { listPublishedStories } from "@/services/stories.service";
+import {
+  listPublishedStories,
+  listTrendingStories,
+} from "@/services/stories.service";
 import { getApiErrorMessage } from "@/services/api";
 import type { Story } from "@/types";
 import { excerptFromContent } from "@/utils/excerpt";
@@ -21,15 +25,17 @@ import {
   unbookmarkStory,
 } from "@/services/bookmarks.service";
 import { cn } from "@/lib/cn";
+import { STORY_COVER_PLACEHOLDER } from "@/lib/picsum";
 
-const PAGE_SIZE = 10;
+const FULL_PAGE_SIZE = 10;
+const COMPACT_PAGE_SIZE = 4;
 
-const FEED_IMAGES = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCzdDAcPWjJ8pVVt_VOrxVvW5DbZ2HCOO9LF7ajaKJl-XZz0sWckp0rJZTYCKcRkBSYvrIFEBpO0vFOGw8qsMP2aKWJD3o5nlaLFJWSSCtYYJPT3z7TltI_f53pEXK0T_1RHybsRG9M_i-Q3xMhfjzlgm2A81X4-CJvunsyNPQsfaV1-oHvVEhEkPE1rsuK8K9ifBOoGRckWOSxzuQdyrauCY023MRCpv4cvemASfkxGPbjOvvf2RegCs0sgHcFSYjhD700_tkL_9Y",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBslZhfscsWyRla7DOIvp_icE2lsehDrFoS53_ksJp9JlLwPrWgIIUWIFXJPgp_Txlk8XqgL_2YVGTeszejahxU90hqBQhD__RdPJfISKMCD0GS4AkxNDeIpkF01hSQF6oEk1CBHar7nK3PB4gxEBID3sbVQhA6ph0YtW9WBo6bTozsLehSX7M7gTiYR5LyDYfppBGhZ262EJAFeWzzx5Uyms-TFXbrZDy33pRK3XcxiMdTTXdvJgx_fo4tEp42cDlPIhCoXd34xeE",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCSGlSdlDYl__f4qA-KAVrgJ_-3FIc0NUniW-6018ioSKY0Dr2jHUlU4YQ9-3ivsS6i5BPBmm6NZVBRUZK6vIiJ4OsLCIO7YFwLhvQ_hZddvnnXoRm2moMOD8K0wtDpdI3tbd_rWQp8Yxp3n-7I6MDXggpwtvauUi7YxU6sBQNlCo-Zg3AsmTxd8b1Nyrmp2pQcpNcvB5GlSf7A6CSFJ0Kr6BcwamfIPGerL_n9pZG6S1x2PAENWxHDEg1gc9u_8a_k99SE14Zrfes",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuAhVgbufBeQvQwGsXBOyJYW940YjwJsezkhFRSbvQQDRWojlcMNaLpehaOwoqRv8WHmRBniXk_hS1rkBk2VYWh0vgW3ud3MthI26qqXk6tz4f-JX6xqvs5ekduTvwsJQ4U9U9DVYYTExMOnJRizKCvLxj5dkePXoKxuOs_LCN2AgOjYs9S1iZ0TE7WZmOymoSprVvBF_pNemdDjP11wVB8vtQv3X7z4OSWd-6-6eFoReH59pPdwpbANkPqG2XEL2dtKSkKJ1yF8LSo",
-] as const;
+export type HomeFeedProps = {
+  /** First 4 stories only; no infinite scroll */
+  compact?: boolean;
+  /** Full list only; ignored when `compact` */
+  sort?: "latest" | "likes";
+};
 
 function estimateReadMinutes(content: string) {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
@@ -58,7 +64,7 @@ function EditorialFeedCardSkeleton() {
   );
 }
 
-export function HomeFeed() {
+export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
   const [items, setItems] = useState<Story[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -69,37 +75,55 @@ export function HomeFeed() {
   const toggleBookmarkLocal = useBookmarkStore((s) => s.toggle);
   const bookmarkIds = useBookmarkStore((s) => s.ids);
 
-  const load = useCallback(async (p: number, append: boolean) => {
-    if (append) setLoadingMore(true);
-    else setLoading(true);
-    try {
-      const res = await listPublishedStories({ page: p, pageSize: PAGE_SIZE });
-      setItems((prev) => {
-        const chunk = res.items;
-        const merged = append ? [...prev, ...chunk] : chunk;
-        const seen = new Set<string>();
-        return merged.filter((s) =>
-          seen.has(s.id) ? false : (seen.add(s.id), true),
-        );
-      });
-      const tp =
-        res.totalPages ??
-        Math.max(1, Math.ceil(res.total / (res.pageSize || PAGE_SIZE)));
-      setTotalPages(tp);
-      setPage(res.page);
-    } catch (e) {
-      toast.error(getApiErrorMessage(e, "Could not load stories"));
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, []);
+  const fetchPage = useCallback(
+    async (p: number) => {
+      if (compact) {
+        return listPublishedStories({ page: p, pageSize: COMPACT_PAGE_SIZE });
+      }
+      if (sort === "likes") {
+        return listTrendingStories({ page: p, pageSize: FULL_PAGE_SIZE });
+      }
+      return listPublishedStories({ page: p, pageSize: FULL_PAGE_SIZE });
+    },
+    [compact, sort],
+  );
+
+  const load = useCallback(
+    async (p: number, append: boolean) => {
+      if (append) setLoadingMore(true);
+      else setLoading(true);
+      try {
+        const res = await fetchPage(p);
+        const pageSizeUsed = compact ? COMPACT_PAGE_SIZE : FULL_PAGE_SIZE;
+        setItems((prev) => {
+          const chunk = res.items;
+          const merged = append ? [...prev, ...chunk] : chunk;
+          const seen = new Set<string>();
+          return merged.filter((s) =>
+            seen.has(s.id) ? false : (seen.add(s.id), true),
+          );
+        });
+        const tp =
+          res.totalPages ??
+          Math.max(1, Math.ceil(res.total / (res.pageSize || pageSizeUsed)));
+        setTotalPages(tp);
+        setPage(res.page);
+      } catch (e) {
+        toast.error(getApiErrorMessage(e, "Could not load stories"));
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [compact, fetchPage],
+  );
 
   useEffect(() => {
-    load(1, false);
+    void load(1, false);
   }, [load]);
 
   useEffect(() => {
+    if (compact) return;
     const el = sentinelRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -107,13 +131,13 @@ export function HomeFeed() {
         const hit = entries[0]?.isIntersecting;
         if (!hit || loading || loadingMore) return;
         if (page >= totalPages) return;
-        load(page + 1, true);
+        void load(page + 1, true);
       },
       { rootMargin: "120px" },
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [load, loading, loadingMore, page, totalPages]);
+  }, [compact, load, loading, loadingMore, page, totalPages]);
 
   const syncBookmarkApi = async (e: React.MouseEvent, story: Story) => {
     e.preventDefault();
@@ -171,7 +195,7 @@ export function HomeFeed() {
   return (
     <>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
-        {items.map((story, index) => {
+        {items.map((story) => {
           const href = `/story/${story.id}`;
           const excerpt =
             story.excerpt?.trim() ||
@@ -180,7 +204,7 @@ export function HomeFeed() {
           const authorName = story.author?.name ?? "Unknown author";
           const saved = bookmarkIds.includes(story.id);
           const readMin = estimateReadMinutes(story.content ?? "");
-          const img = FEED_IMAGES[index % FEED_IMAGES.length];
+          const img = story.bgimg?.trim() || STORY_COVER_PLACEHOLDER;
 
           return (
             <div
@@ -254,11 +278,24 @@ export function HomeFeed() {
           );
         })}
       </div>
-      <div ref={sentinelRef} className="h-4 w-full" aria-hidden />
-      {loadingMore ? (
+      {!compact ? (
+        <div ref={sentinelRef} className="h-4 w-full" aria-hidden />
+      ) : null}
+      {!compact && loadingMore ? (
         <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
           <EditorialFeedCardSkeleton />
           <EditorialFeedCardSkeleton />
+        </div>
+      ) : null}
+      {compact && items.length > 0 ? (
+        <div className="mt-10 flex justify-center">
+          <Link
+            href="/stories"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-transparent px-8 py-3 font-headline text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-on-primary sm:text-base"
+          >
+            View all stories
+            <ArrowRight className="size-4" strokeWidth={2} />
+          </Link>
         </div>
       ) : null}
     </>

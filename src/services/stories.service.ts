@@ -16,6 +16,19 @@ export async function listPublishedStories(params: {
   return normalizePaginated(data, params.page ?? 1, params.pageSize ?? 12);
 }
 
+/** Published stories ordered by likes (then recency). */
+export async function listTrendingStories(params: {
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = params.page ?? 1;
+  const pageSize = params.pageSize ?? 12;
+  const { data } = await api.get<PaginatedStories | Story[]>("/stories/trending", {
+    params: { page, pageSize },
+  });
+  return normalizePaginated(data, page, pageSize);
+}
+
 export async function getStory(id: string) {
   const { data } = await api.get<Story & { comments?: Comment[] }>(
     `/stories/${id}`,
@@ -27,6 +40,7 @@ export async function createStory(body: {
   title: string;
   content: string;
   status?: "DRAFT" | "PUBLISHED";
+  bgimg?: string | null;
 }) {
   const { data } = await api.post<Story>("/stories", {
     ...body,
@@ -37,7 +51,7 @@ export async function createStory(body: {
 
 export async function updateStory(
   id: string,
-  body: Partial<Pick<Story, "title" | "content" | "status">>,
+  body: Partial<Pick<Story, "title" | "content" | "status" | "bgimg">>,
 ) {
   const { data } = await api.patch<Story>(`/stories/${id}`, body);
   return data;
@@ -52,7 +66,10 @@ export async function publishStory(id: string) {
   return data;
 }
 
-export async function saveDraft(id: string, body: { title: string; content: string }) {
+export async function saveDraft(
+  id: string,
+  body: { title: string; content: string; bgimg?: string | null },
+) {
   const { data } = await api.patch<Story>(`/stories/${id}/draft`, body);
   return data;
 }
@@ -60,7 +77,7 @@ export async function saveDraft(id: string, body: { title: string; content: stri
 /** Fallback if backend uses PATCH /stories/:id only */
 export async function saveDraftFlexible(
   id: string,
-  body: { title: string; content: string },
+  body: { title: string; content: string; bgimg?: string | null },
 ) {
   try {
     return await saveDraft(id, body);

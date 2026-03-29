@@ -40,6 +40,8 @@ type EditorToolbarProps = {
   richRootRef?: RefObject<HTMLElement | null>;
   /** After execCommand on the rich editor, sync HTML → markdown. */
   onAfterRichCommand?: () => void;
+  /** Opens cover image picker (story banner, not inline markdown). */
+  onOpenCoverPicker?: () => void;
   className?: string;
   variant?: "dock" | "floating";
 };
@@ -48,6 +50,7 @@ export function EditorToolbar({
   textareaRef,
   richRootRef,
   onAfterRichCommand,
+  onOpenCoverPicker,
   setContent,
   className,
   variant = "dock",
@@ -207,13 +210,17 @@ export function EditorToolbar({
           <button
             type="button"
             className={cn(toolBtnFloat, "gap-2 px-3 md:px-4")}
-            title="Add image"
+            title={onOpenCoverPicker ? "Choose cover image" : "Add image"}
             onClick={() =>
-              toast.message("Use markdown: ![description](https://image-url) in your story.")
+              onOpenCoverPicker
+                ? onOpenCoverPicker()
+                : toast.message("Use markdown: ![description](https://image-url) in your story.")
             }
           >
             <ImagePlus className="size-5 text-primary" strokeWidth={2} />
-            <span className="hidden font-bold text-on-surface md:inline text-sm">Add Image</span>
+            <span className="hidden font-bold text-on-surface md:inline text-sm">
+              {onOpenCoverPicker ? "Cover" : "Add Image"}
+            </span>
           </button>
           {emojiBlock(
             toolBtnFloat,
@@ -292,6 +299,19 @@ export function EditorToolbar({
         <Quote className="size-4" strokeWidth={2.25} />
       </button>
       <span className="mx-0.5 hidden h-6 w-px bg-dark/15 sm:block" aria-hidden />
+      <button
+        type="button"
+        className={toolBtnDock}
+        aria-label={onOpenCoverPicker ? "Choose cover image" : "Add image"}
+        title={onOpenCoverPicker ? "Cover image" : "Add image"}
+        onClick={() =>
+          onOpenCoverPicker
+            ? onOpenCoverPicker()
+            : toast.message("Use markdown: ![alt](url) for inline images.")
+        }
+      >
+        <ImagePlus className="size-4 text-primary" strokeWidth={2.25} />
+      </button>
       {emojiBlock(
         toolBtnDock,
         "left-0 top-full mt-1 h-[380px] w-[300px] max-w-[min(100vw-2rem,300px)]",

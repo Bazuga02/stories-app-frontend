@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, PenLine, Search, Shield } from "lucide-react";
-import { toast } from "sonner";
+import { LayoutDashboard, LogOut, PenLine, Shield } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAuthStore } from "@/store/authStore";
 
@@ -30,6 +29,7 @@ export function Navbar() {
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const exploreActive = pathname === "/";
+  const allStoriesActive = pathname === "/stories";
 
   useEffect(() => {
     if (!profileOpen) return;
@@ -70,6 +70,17 @@ export function Navbar() {
               )}
             >
               Explore
+            </Link>
+            <Link
+              href="/stories"
+              className={cn(
+                navLink,
+                allStoriesActive
+                  ? "border-b-2 border-primary pb-1 text-primary dark:text-[#f43651]"
+                  : "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+              )}
+            >
+              All stories
             </Link>
             <Link
               href="/#short-stories"
@@ -122,14 +133,6 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">
-            <button
-              type="button"
-              className="text-on-surface transition-colors hover:text-primary dark:text-[#e7e7d8]"
-              aria-label="Search"
-              onClick={() => toast.message("Search is coming soon.")}
-            >
-              <Search className="size-6" strokeWidth={2} />
-            </button>
             {user ? (
               <div className="relative" ref={profileMenuRef}>
                 <button
@@ -193,6 +196,15 @@ export function Navbar() {
             )}
           >
             Explore
+          </Link>
+          <Link
+            href="/stories"
+            className={cn(
+              "text-sm font-bold",
+              allStoriesActive ? "text-primary" : "text-on-surface/80",
+            )}
+          >
+            All stories
           </Link>
           <Link href="/#short-stories" className="text-sm font-bold text-on-surface/80">
             Short stories

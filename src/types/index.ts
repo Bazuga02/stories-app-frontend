@@ -30,6 +30,8 @@ export interface Story {
   viewCount?: number;
   createdAt?: string;
   updatedAt?: string;
+  /** Cover image URL from API */
+  bgimg?: string | null;
 }
 
 export interface Comment {

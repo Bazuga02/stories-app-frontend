@@ -36,13 +36,9 @@ import { Modal } from "@/components/ui/modal";
 import { PageLoader } from "@/components/ui/loader";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/cn";
+import { STORY_COVER_PLACEHOLDER } from "@/lib/picsum";
 
 type StudioView = "mine" | "liked" | "bookmarks" | "drafts";
-
-const CARD_IMAGES = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCSGlSdlDYl__f4qA-KAVrgJ_-3FIc0NUniW-6018ioSKY0Dr2jHUlU4YQ9-3ivsS6i5BPBmm6NZVBRUZK6vIiJ4OsLCIO7YFwLhvQ_hZddvnnXoRm2moMOD8K0wtDpdI3tbd_rWQp8Yxp3n-7I6MDXggpwtvauUi7YxU6sBQNlCo-Zg3AsmTxd8b1Nyrmp2pQcpNcvB5GlSf7A6CSFJ0Kr6BcwamfIPGerL_n9pZG6S1x2PAENWxHDEg1gc9u_8a_k99SE14Zrfes",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuAhVgbufBeQvQwGsXBOyJYW940YjwJsezkhFRSbvQQDRWojlcMNaLpehaOwoqRv8WHmRBniXk_hS1rkBk2VYWh0vgW3ud3MthI26qqXk6tz4f-JX6xqvs5ekduTvwsJQ4U9U9DVYYTExMOnJRizKCvLxj5dkePXoKxuOs_LCN2AgOjYs9S1iZ0TE7WZmOymoSprVvBF_pNemdDjP11wVB8vtQv3X7z4OSWd-6-6eFoReH59pPdwpbANkPqG2XEL2dtKSkKJ1yF8LSo",
-] as const;
 
 const PROFILE_FALLBACK =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAqZP2ZeDx-_yvQMtbRRIpBp7tvhet4f1hzr8hgpZ1ip3soR6KwozLoNqQPmeHlAIUOvjop69INLzsetBE-FmlXjfzOKiJtWlk5yDLnZcq0dmPX78DVAG_NyzCCnBNfAKO4MegzDlqHCZzV-qXBfbo5MDuirufTO96zIPQT8H2A4jjtRJRmA_UTkSOzdcTqPXOCl4vDdHdDU7sKHGnOlbpxXKH17NccICr6s_Cn6rQGYC3z8R65jynvlhI_hpWAy19trbkiiWGGRh4";
@@ -498,8 +494,8 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                {listItems.map((s, index) => {
-                  const img = CARD_IMAGES[index % CARD_IMAGES.length];
+                {listItems.map((s) => {
+                  const img = s.bgimg?.trim() || STORY_COVER_PLACEHOLDER;
                   const mine = isAuthor(s, user?.id);
                   const published = s.status === "PUBLISHED";
                   return (

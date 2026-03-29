@@ -26,6 +26,7 @@ import {
 } from "@/components/editor/RichMarkdownEditor";
 import { cn } from "@/lib/cn";
 import { Footer } from "@/components/ui/footer";
+import { randomPicsumCoverCandidates } from "@/lib/picsum";
 
 const schema = z.object({
   title: z.string().max(200),
@@ -77,9 +78,14 @@ export function EditorPageClient() {
   const [initializing, setInitializing] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [savedSnapshot, setSavedSnapshot] = useState<{ title: string; content: string } | null>(
-    null,
-  );
+  const [savedSnapshot, setSavedSnapshot] = useState<{
+    title: string;
+    content: string;
+    bgimg: string | null;
+  } | null>(null);
+  const [bgimg, setBgimg] = useState<string | null>(null);
+  const [coverPickerOpen, setCoverPickerOpen] = useState(false);
+  const [coverCandidates, setCoverCandidates] = useState<string[]>([]);
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
   const richEditorHandle = useRef<RichMarkdownEditorHandle>(null);
@@ -111,8 +117,12 @@ export function EditorPageClient() {
 
   const isDirty = useMemo(() => {
     if (savedSnapshot === null) return false;
-    return (title ?? "") !== savedSnapshot.title || (content ?? "") !== savedSnapshot.content;
-  }, [title, content, savedSnapshot]);
+    return (
+      (title ?? "") !== savedSnapshot.title ||
+      (content ?? "") !== savedSnapshot.content ||
+      (bgimg ?? "") !== (savedSnapshot.bgimg ?? "")
+    );
+  }, [title, content, bgimg, savedSnapshot]);
 
   const bootstrap = useCallback(async () => {
     setInitializing(true);
@@ -120,16 +130,20 @@ export function EditorPageClient() {
     try {
       if (existingId) {
         const s = await getStory(existingId);
+        const b = s.bgimg?.trim() ?? null;
+        setBgimg(b);
         reset({ title: s.title ?? "", content: s.content ?? "" });
         setSavedSnapshot({
           title: s.title ?? "",
           content: s.content ?? "",
+          bgimg: b,
         });
         setStoryId(s.id);
       } else {
         setStoryId(null);
+        setBgimg(null);
         reset({ title: "", content: "" });
-        setSavedSnapshot({ title: "", content: "" });
+        setSavedSnapshot({ title: "", content: "", bgimg: null });
       }
     } catch (e) {
       toast.error(getApiErrorMessage(e, "Could not open editor"));
@@ -170,17 +184,22 @@ export function EditorPageClient() {
   }, [isDirty]);
 
   const persistDraft = async (data: Form): Promise<boolean> => {
+    const cover = bgimg?.trim() || null;
     try {
       if (!storyId) {
         const created = await createStory({
           title: data.title.trim() || "Untitled story",
           content: data.content,
           status: "DRAFT",
+          bgimg: cover ?? undefined,
         });
         setStoryId(created.id);
+        const savedCover = created.bgimg?.trim() ?? null;
+        setBgimg(savedCover);
         const snap = {
           title: created.title ?? (data.title.trim() || "Untitled story"),
           content: created.content ?? data.content,
+          bgimg: savedCover,
         };
         setSavedSnapshot(snap);
         router.replace(`/editor?id=${created.id}`);
@@ -188,8 +207,13 @@ export function EditorPageClient() {
         await saveDraftFlexible(storyId, {
           title: data.title,
           content: data.content,
+          bgimg: bgimg?.trim() ?? "",
         });
-        setSavedSnapshot({ title: data.title, content: data.content });
+        setSavedSnapshot({
+          title: data.title,
+          content: data.content,
+          bgimg: cover,
+        });
       }
       toast.success("Draft saved");
       return true;
@@ -211,18 +235,23 @@ export function EditorPageClient() {
   const onPublish = handleSubmit(async (data) => {
     setPublishing(true);
     try {
+      const cover = bgimg?.trim() || null;
       let id = storyId;
       if (!id) {
         const created = await createStory({
           title: data.title.trim() || "Untitled story",
           content: data.content,
           status: "DRAFT",
+          bgimg: cover ?? undefined,
         });
         id = created.id;
         setStoryId(id);
+        const savedCover = created.bgimg?.trim() ?? null;
+        setBgimg(savedCover);
         setSavedSnapshot({
           title: created.title ?? (data.title.trim() || "Untitled story"),
           content: created.content ?? data.content,
+          bgimg: savedCover,
         });
         router.replace(`/editor?id=${id}`);
       }
@@ -231,6 +260,7 @@ export function EditorPageClient() {
           title: data.title,
           content: data.content,
           status: "DRAFT",
+          bgimg: cover ?? undefined,
         });
         await publishStory(id);
         toast.success("Published!");
@@ -241,6 +271,7 @@ export function EditorPageClient() {
             title: data.title,
             content: data.content,
             status: "PUBLISHED",
+            bgimg: cover ?? undefined,
           });
           toast.success("Published!");
           window.location.assign(`/story/${id}`);
@@ -291,6 +322,11 @@ export function EditorPageClient() {
   };
 
   const contentLen = (content ?? "").length;
+
+  const openCoverPicker = useCallback(() => {
+    setCoverCandidates(randomPicsumCoverCandidates());
+    setCoverPickerOpen(true);
+  }, []);
 
   const { ref: titleRef, ...titleRegister } = register("title");
 
@@ -457,9 +493,8 @@ export function EditorPageClient() {
                     </span>
                   ) : (
                     <span>
-                      <strong className="font-semibold text-on-surface/80">Tip:</strong> use the
-                      floating bar for bold, italic, and lists. Published stories still use markdown
-                      under the hood; images:{" "}
+                      <strong className="font-semibold text-on-surface/80">Tip:</strong> use{" "}
+                      <strong>Cover</strong> in the bar for the story banner. Inline photos:{" "}
                       <code className="rounded bg-surface-container-high px-1 py-0.5 font-mono text-[10px]">
                         ![alt](url)
                       </code>
@@ -480,11 +515,45 @@ export function EditorPageClient() {
               variant="floating"
               richRootRef={richRootRef}
               onAfterRichCommand={() => richEditorHandle.current?.flush()}
+              onOpenCoverPicker={openCoverPicker}
               setContent={setContentValue}
             />
           </div>
         </div>
       </div>
+
+      <Modal
+        open={coverPickerOpen}
+        onClose={() => setCoverPickerOpen(false)}
+        title="Choose cover image"
+        className="max-w-2xl"
+      >
+        <p className="mb-4 text-sm leading-relaxed text-on-surface-variant">
+          Pick one image for the story banner (feed and story page). It is not inserted into the
+          article text.
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {coverCandidates.map((url) => (
+            <button
+              key={url}
+              type="button"
+              onClick={() => {
+                setBgimg(url);
+                setCoverPickerOpen(false);
+                toast.success("Cover selected — save draft to keep it.");
+              }}
+              className="group overflow-hidden rounded-xl ring-offset-2 transition-shadow hover:ring-2 hover:ring-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                alt=""
+                className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                src={url}
+              />
+            </button>
+          ))}
+        </div>
+      </Modal>
 
       <Modal open={leaveModalOpen} onClose={handleLeaveCancel} title="Save draft?">
         <p className="mb-[var(--spacing-lg)] text-[0.95rem] leading-relaxed text-dark/80">
