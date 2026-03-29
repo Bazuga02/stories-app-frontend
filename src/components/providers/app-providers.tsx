@@ -1,8 +1,16 @@
 "use client";
 
 import { Toaster } from "sonner";
+import { LegalDocumentModals } from "@/components/legal/LegalDocumentModals";
 import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
+import { useLegalModalStore } from "@/store/legalModalStore";
 import { AuthReadyProvider } from "./auth-ready-context";
+
+function GlobalLegalModals() {
+  const open = useLegalModalStore((s) => s.open);
+  const close = useLegalModalStore((s) => s.close);
+  return <LegalDocumentModals open={open} onClose={close} />;
+}
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const ready = useAuthBootstrap();
@@ -10,6 +18,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <AuthReadyProvider ready={ready}>
       {children}
+      <GlobalLegalModals />
       <Toaster
         position="top-center"
         toastOptions={{

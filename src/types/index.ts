@@ -26,6 +26,8 @@ export interface Story {
   likesCount?: number;
   likedByMe?: boolean;
   commentCount?: number;
+  /** Story detail views (when exposed by API). */
+  viewCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }

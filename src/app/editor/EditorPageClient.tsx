@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { PenLine, Star, Tag, X } from "lucide-react";
 import { toast } from "sonner";
-import { PenLine } from "lucide-react";
 import {
   createStory,
   getStory,
@@ -16,12 +17,15 @@ import {
 } from "@/services/stories.service";
 import { getApiErrorMessage } from "@/services/api";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PageLoader } from "@/components/ui/loader";
 import { Modal } from "@/components/ui/modal";
-import { Card } from "@/components/ui/card";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
+import {
+  RichMarkdownEditor,
+  type RichMarkdownEditorHandle,
+} from "@/components/editor/RichMarkdownEditor";
 import { cn } from "@/lib/cn";
+import { Footer } from "@/components/ui/footer";
 
 const schema = z.object({
   title: z.string().max(200),
@@ -29,6 +33,9 @@ const schema = z.object({
 });
 
 type Form = z.infer<typeof schema>;
+
+const TIP_IMG =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuDRwf2vuWjVGMnzgAbLEfIcRJ0vEVbWjPVTBKsCmL3y73P4EJVMwE3c_6gLREGhiFCxAscDx-1RSwMJxbQ9YNGzl58aK9aneq4FlgZDguXte1mtl3RRw4PCw7XO19g_SEMlg9SANg9qu7qqb09ZcgBDpvT7NPYOR9QG44z6-9SqHYHohSvk1bGqpvtW5tesDUbTF_r50x02vIVof4En5--Wm1m-P_KO_WAvZn7n4CUrVfS2DoJJtGKDFy5H0v_nG6QC3m2L4--H0zU";
 
 function normalizeInternalHref(href: string): string {
   if (href.startsWith("/")) {
@@ -75,10 +82,14 @@ export function EditorPageClient() {
   );
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
-  const contentRef = useRef<HTMLTextAreaElement | null>(null);
+  const richEditorHandle = useRef<RichMarkdownEditorHandle>(null);
+  const richRootRef = useRef<HTMLDivElement>(null);
+  const [tags, setTags] = useState<string[]>(["Minimalism", "Lifestyle"]);
+  const [tagInput, setTagInput] = useState("");
 
   const {
     register,
+    control,
     watch,
     handleSubmit,
     reset,
@@ -89,16 +100,6 @@ export function EditorPageClient() {
     resolver: zodResolver(schema),
     defaultValues: { title: "", content: "" },
   });
-
-  const { ref: registerContentRef, ...contentRegisterRest } = register("content");
-
-  const mergeContentRef = useCallback(
-    (el: HTMLTextAreaElement | null) => {
-      contentRef.current = el;
-      registerContentRef(el);
-    },
-    [registerContentRef],
-  );
 
   const setContentValue = useCallback(
     (v: string) => setValue("content", v, { shouldDirty: true, shouldValidate: true }),
@@ -291,116 +292,201 @@ export function EditorPageClient() {
 
   const contentLen = (content ?? "").length;
 
+  const { ref: titleRef, ...titleRegister } = register("title");
+
+  const addTag = () => {
+    const raw = tagInput.trim().replace(/^#+/, "");
+    if (!raw) return;
+    if (tags.includes(raw)) {
+      setTagInput("");
+      return;
+    }
+    setTags((t) => [...t, raw]);
+    setTagInput("");
+  };
+
   if (initializing) {
     return <PageLoader />;
   }
 
   return (
     <>
-      <main className="container-design flex flex-1 flex-col py-[var(--spacing-xl)] pb-[var(--spacing-2xl)]">
-        <header className="mb-[var(--spacing-lg)] flex flex-col gap-[var(--spacing-md)] md:mb-[var(--spacing-xl)] md:flex-row md:items-end md:justify-between">
-          <div className="flex gap-3">
-            <div
-              className="flex size-12 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-accent text-white shadow-[var(--shadow-card)]"
-              aria-hidden
-            >
-              <PenLine className="size-6" strokeWidth={2.25} />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 shrink-0 border-b border-outline-variant/10 bg-editorial-surface">
+          <nav className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-4">
+            <div className="flex flex-wrap items-center gap-4 md:gap-8">
+              <Link
+                href="/"
+                className="font-headline text-2xl font-black tracking-tighter text-primary sm:text-3xl"
+              >
+                Stories
+              </Link>
+              <Link
+                href="/"
+                className="font-headline text-base font-bold text-primary transition-colors hover:text-primary/85 lg:text-lg"
+              >
+                Explore
+              </Link>
             </div>
-            <div>
-              <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-accent">
-                Write
-              </p>
-              <h1 className="text-section-heading mt-0.5 text-[clamp(1.65rem,4vw,2.35rem)] leading-tight">
-                Your story
-              </h1>
-              <p className="mt-2 max-w-md text-[0.92rem] leading-snug text-dark/65">
-                Use the toolbar for <strong className="font-semibold text-dark/80">bold</strong>,{" "}
-                <em className="italic text-dark/80">italic</em>, headings, lists, quotes, and emoji
-                — readers see it formatted on the story page.
-              </p>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <span className="rounded-full bg-surface-container-high px-3 py-1 text-xs font-bold tracking-wider text-on-surface-variant">
+                Draft
+              </span>
+              <button
+                type="button"
+                disabled={saving}
+                className="font-headline text-base font-bold text-[#161616] opacity-80 transition-transform hover:text-primary active:scale-95 disabled:opacity-50 dark:text-[#e7e7d8] lg:text-lg"
+                onClick={() => void saveDraftNow()}
+              >
+                {saving ? "Saving…" : "Save Draft"}
+              </button>
+              <button
+                type="button"
+                disabled={publishing}
+                className="scale-95 rounded-full bg-primary px-5 py-2 font-headline text-base font-bold text-on-primary transition-all hover:bg-primary-container active:scale-90 disabled:opacity-60 lg:px-6 lg:text-lg"
+                onClick={() => void onPublish()}
+              >
+                {publishing ? "Publishing…" : "Publish"}
+              </button>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2 md:justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              isLoading={saving}
-              onClick={() => void saveDraftNow()}
-            >
-              Save draft
-            </Button>
-            <Button
-              type="button"
-              variant="accent"
-              isLoading={publishing}
-              onClick={() => void onPublish()}
-            >
-              Publish
-            </Button>
-          </div>
+          </nav>
         </header>
 
-        <Card className="mx-auto w-full max-w-3xl overflow-hidden border border-dark/10 bg-white shadow-[var(--shadow-card-hover)]">
-          <form className="flex flex-col gap-0">
-            <div className="border-b border-dark/10 bg-[color-mix(in_srgb,var(--color-surface)_75%,white)] px-[var(--spacing-lg)] pb-[var(--spacing-md)] pt-[var(--spacing-lg)]">
-              <Input
-                label="Title"
-                placeholder="Give it a name readers will remember"
-                error={errors.title?.message}
-                className="border-dark/12 bg-white font-display text-[1.15rem] font-bold tracking-wide placeholder:font-body placeholder:font-normal placeholder:tracking-normal"
-                {...register("title")}
+        <main className="hide-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+          <div className="pointer-events-none fixed top-20 right-[5%] -z-10 opacity-20">
+            <PenLine className="size-24 text-tertiary-fixed-dim sm:size-[120px]" strokeWidth={0.75} />
+          </div>
+
+          <div className="fixed bottom-32 left-6 z-10 hidden opacity-40 xl:block">
+            <div className="editor-cloud-shape flex size-24 items-center justify-center bg-tertiary-fixed-dim">
+              <Star className="size-10 fill-primary text-primary" strokeWidth={0} />
+            </div>
+          </div>
+
+          <div className="fixed right-8 top-40 z-10 hidden w-64 rotate-3 rounded-editorial-xl bg-surface-container-low p-4 shadow-lg transition-transform duration-500 hover:rotate-0 lg:block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={TIP_IMG}
+              alt="Fountain pen on paper"
+              className="mb-4 h-40 w-full rounded-lg object-cover"
+            />
+            <p className="font-headline mb-1 text-xs font-bold text-primary">EDITOR&apos;S TIP</p>
+            <p className="text-xs leading-relaxed text-on-surface-variant">
+              Let the white space breathe. Great stories need room to grow between the lines.
+            </p>
+          </div>
+
+          <div className="mx-auto max-w-4xl px-5 pt-8 pb-16 sm:px-6 sm:pt-12 sm:pb-24">
+            <div className="mb-10 sm:mb-12">
+              <textarea
+                ref={titleRef}
+                rows={2}
+                placeholder="The story starts here..."
+                className="w-full resize-none border-none bg-transparent p-0 font-headline text-4xl font-black leading-tight tracking-tight text-on-surface placeholder:opacity-20 focus:ring-0 focus:outline-none sm:text-5xl md:text-6xl lg:text-7xl"
+                {...titleRegister}
               />
+              {errors.title?.message ? (
+                <p className="mt-2 text-sm text-error" role="alert">
+                  {errors.title.message}
+                </p>
+              ) : null}
+
+              <div className="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-2 rounded-full bg-surface-container-low px-4 py-2">
+                  <Tag className="size-4 shrink-0 text-primary" strokeWidth={2} />
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addTag();
+                      }
+                    }}
+                    className="w-28 border-none bg-transparent p-0 text-sm font-medium text-on-surface placeholder:text-on-surface-variant focus:ring-0 focus:outline-none sm:w-32"
+                    placeholder="Add tags..."
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
+                    >
+                      #{t}
+                      <button
+                        type="button"
+                        className="rounded-full p-0.5 hover:bg-primary/20"
+                        aria-label={`Remove ${t}`}
+                        onClick={() => setTags((prev) => prev.filter((x) => x !== t))}
+                      >
+                        <X className="size-3" strokeWidth={2.5} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="px-[var(--spacing-lg)] pb-[var(--spacing-lg)] pt-[var(--spacing-md)]">
-              <div className="mb-[var(--spacing-xs)] flex flex-wrap items-end justify-between gap-2">
-                <label htmlFor="content" className="text-label">
-                  Story
-                </label>
-                <span className="text-[0.7rem] font-medium tabular-nums text-dark/45">
-                  {contentLen.toLocaleString()} characters
-                </span>
-              </div>
-
-              <div
-                className={cn(
-                  "overflow-hidden rounded-[var(--radius-md)] border-[1.5px] border-dark/12 bg-white transition-[border-color,box-shadow] duration-[var(--motion-fast)]",
-                  errors.content
-                    ? "border-accent shadow-[0_0_0_3px_rgba(244,54,81,0.12)]"
-                    : "focus-within:border-dark focus-within:shadow-[0_0_0_3px_rgba(22,22,22,0.06)]",
+            <article className="serif-editor min-h-[min(512px,50vh)]">
+              <Controller
+                name="content"
+                control={control}
+                render={({ field }) => (
+                  <RichMarkdownEditor
+                    ref={richEditorHandle}
+                    editorRootRef={richRootRef}
+                    id="content"
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Start typing your story… Use the toolbar for bold, lists, and more. Your words show formatted as you write."
+                    aria-invalid={!!errors.content}
+                    className={cn(
+                      errors.content &&
+                        "ring-2 ring-error/40 ring-offset-2 ring-offset-editorial-surface",
+                    )}
+                  />
                 )}
-              >
-                <EditorToolbar textareaRef={contentRef} setContent={setContentValue} />
-                <textarea
-                  id="content"
-                  ref={mergeContentRef}
-                  rows={20}
-                  placeholder="Start typing… Select text and use bold, italic, or drop in an emoji from the toolbar."
-                  className="min-h-[min(58vh,560px)] w-full resize-y border-0 bg-transparent px-4 py-4 text-[1.05rem] leading-[1.75] text-dark placeholder:text-dark/38 outline-none"
-                  {...contentRegisterRest}
-                />
+              />
+              <div className="mt-3 flex justify-between gap-4 text-xs text-on-surface-variant">
+                <span>
+                  {errors.content?.message ? (
+                    <span className="text-error" role="alert">
+                      {errors.content.message}
+                    </span>
+                  ) : (
+                    <span>
+                      <strong className="font-semibold text-on-surface/80">Tip:</strong> use the
+                      floating bar for bold, italic, and lists. Published stories still use markdown
+                      under the hood; images:{" "}
+                      <code className="rounded bg-surface-container-high px-1 py-0.5 font-mono text-[10px]">
+                        ![alt](url)
+                      </code>
+                    </span>
+                  )}
+                </span>
+                <span className="tabular-nums opacity-70">{contentLen.toLocaleString()} chars</span>
               </div>
-              {errors.content?.message ? (
-                <p className="mt-[var(--spacing-xs)] text-[0.75rem] font-medium text-accent" role="alert">
-                  {errors.content.message}
-                </p>
-              ) : (
-                <p className="mt-2 text-[0.75rem] text-dark/50">
-                  Tip: <code className="rounded bg-dark/[0.06] px-1 py-0.5 font-mono text-[0.7rem]">**bold**</code>{" "}
-                  · <code className="rounded bg-dark/[0.06] px-1 py-0.5 font-mono text-[0.7rem]">*italic*</code> ·{" "}
-                  <code className="rounded bg-dark/[0.06] px-1 py-0.5 font-mono text-[0.7rem]">## Heading</code>
-                </p>
-              )}
-            </div>
-          </form>
-        </Card>
-      </main>
+            </article>
+          </div>
 
-      <Modal
-        open={leaveModalOpen}
-        onClose={handleLeaveCancel}
-        title="Save draft?"
-      >
+          <Footer className="mt-16 shrink-0 pb-16 sm:pb-20" />
+        </main>
+
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4 sm:bottom-8">
+          <div className="glass-editor-toolbar pointer-events-auto flex items-center gap-0.5 rounded-full border border-outline-variant/20 p-2 shadow-xl md:gap-1">
+            <EditorToolbar
+              variant="floating"
+              richRootRef={richRootRef}
+              onAfterRichCommand={() => richEditorHandle.current?.flush()}
+              setContent={setContentValue}
+            />
+          </div>
+        </div>
+      </div>
+
+      <Modal open={leaveModalOpen} onClose={handleLeaveCancel} title="Save draft?">
         <p className="mb-[var(--spacing-lg)] text-[0.95rem] leading-relaxed text-dark/80">
           You have unsaved changes. Save your draft before leaving, or leave without saving.
         </p>

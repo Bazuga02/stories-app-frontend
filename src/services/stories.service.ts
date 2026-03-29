@@ -79,10 +79,17 @@ export async function unlikeStory(id: string) {
   return getStory(id);
 }
 
-export async function listMyStories(status?: "DRAFT" | "PUBLISHED") {
+export async function listMyStories(
+  status?: "DRAFT" | "PUBLISHED",
+  pagination?: { page?: number; pageSize?: number },
+) {
+  const page = pagination?.page ?? 1;
+  const pageSize = pagination?.pageSize ?? 50;
+  const params: Record<string, string | number> = { page, pageSize };
+  if (status) params.status = status;
   try {
     const { data } = await api.get<Story[] | PaginatedStories>("/stories/me", {
-      params: status ? { status } : undefined,
+      params,
     });
     if (Array.isArray(data)) return data;
     return data.items ?? [];
@@ -90,7 +97,7 @@ export async function listMyStories(status?: "DRAFT" | "PUBLISHED") {
     if (!axios.isAxiosError(e) || e.response?.status !== 404) throw e;
     const { data } = await api.get<Story[] | PaginatedStories>(
       "/users/me/stories",
-      { params: status ? { status } : undefined },
+      { params },
     );
     if (Array.isArray(data)) return data;
     return data.items ?? [];

@@ -1,19 +1,19 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import Lottie from "lottie-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { Eye, EyeOff, Quote, Sparkles, Star } from "lucide-react";
 import { login } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/services/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { CardInner } from "@/components/ui/card";
-import { HomeHeroLottie } from "@/features/home/HomeHeroLottie";
+import { Footer } from "@/components/ui/footer";
+import loginAnimation from "../../../public/login-anim.json";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -26,6 +26,7 @@ export function LoginPageClient() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
   const setAuth = useAuthStore((s) => s.setAuth);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -45,61 +46,184 @@ export function LoginPageClient() {
   };
 
   return (
-    <main className="container-design flex flex-1 flex-col items-center justify-center py-[var(--spacing-section)]">
-      <div className="grid w-full max-w-5xl items-stretch gap-[var(--spacing-xl)] lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.9fr)]">
-        <section className="hidden rounded-[var(--radius-xl)] border border-dark/10 bg-white/70 p-[var(--spacing-xl)] shadow-card lg:flex lg:flex-col lg:justify-between">
-          <div>
-            <p className="text-label mb-2 uppercase tracking-wider text-dark/55">
-              Your writing space
-            </p>
-            <h2 className="font-hero text-[clamp(1.8rem,4vw,2.6rem)] font-bold leading-[1.05] text-accent">
-              Pick up where you left off.
-            </h2>
-            <p className="mt-3 max-w-sm text-dark/75">
-              Continue drafting, follow authors, and keep your reading list in sync.
-            </p>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden text-on-surface md:flex-row">
+        {/* Left: illustration */}
+        <section className="relative hidden w-full flex-col items-center justify-center overflow-hidden bg-surface-container-low p-6 md:flex md:w-1/2 md:p-8 lg:w-[55%]">
+          <div className="absolute top-14 left-14 text-primary opacity-20">
+            <Star aria-hidden className="size-12" strokeWidth={1.25} />
           </div>
-          <HomeHeroLottie className="mt-6" src="/Book Lover.json" />
+          <div className="absolute right-8 bottom-32 rotate-12 text-tertiary-container opacity-20">
+            <Sparkles aria-hidden className="size-18" strokeWidth={1.25} />
+          </div>
+          <div className="relative z-10 w-full max-w-lg lg:max-w-xl">
+            <div className="editorial-cloud -rotate-2 transform bg-surface-container-lowest p-2 shadow-2xl">
+              <Lottie
+                animationData={loginAnimation}
+                loop
+                className="h-[min(44vh,440px)] w-full md:h-[420px] lg:h-[480px] [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain"
+                aria-label="Animated illustration for Stories sign-in"
+              />
+            </div>
+            <div className="absolute -right-5 -bottom-6 max-w-[220px] rotate-3 rounded-editorial border border-outline-variant/10 bg-surface-container-lowest p-4 shadow-xl sm:max-w-xs sm:p-5">
+              <Quote aria-hidden className="mb-1.5 size-6 text-primary" strokeWidth={2} />
+              <p className="font-headline text-base leading-snug text-on-surface sm:text-lg">
+                Every word is a <span className="text-primary">new world</span> waiting to be built.
+              </p>
+              <div className="mt-2.5 flex items-center gap-2">
+                <div className="size-6 rounded-full bg-secondary-fixed sm:size-7" />
+                <span className="text-on-secondary-container text-[10px] font-bold tracking-widest uppercase sm:text-xs">
+                  The Editorial Team
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
+            <Link
+              href="/"
+              className="font-headline text-3xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container"
+            >
+              Stories
+            </Link>
+          </div>
         </section>
 
-        <section className="w-full max-w-md justify-self-center lg:max-w-none">
-          <p className="text-hero-heading mb-2 text-center text-[clamp(1.75rem,5vw,2.5rem)]">
-            Welcome back
-          </p>
-          <p className="mb-[var(--spacing-xl)] text-center text-[1rem] text-dark/75">
-            Sign in to write, bookmark, and manage your stories.
-          </p>
-          <CardInner className="!border !border-dark/10 !bg-white/95 !p-[var(--spacing-lg)] !shadow-card">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-[var(--spacing-md)]"
+        {/* Right: form */}
+        <section className="relative flex w-full flex-col items-center justify-center bg-editorial-surface px-5 py-10 pt-16 md:w-1/2 md:px-10 md:py-12 lg:w-[45%] lg:px-12">
+          <div className="absolute top-5 left-5 md:hidden">
+            <Link
+              href="/"
+              className="font-headline text-xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container"
             >
-              <Input
-                label="Email"
-                type="email"
-                autoComplete="email"
-                error={errors.email?.message}
-                {...register("email")}
-              />
-              <PasswordInput
-                label="Password"
-                autoComplete="current-password"
-                error={errors.password?.message}
-                {...register("password")}
-              />
-              <Button type="submit" className="w-full" isLoading={isSubmitting}>
-                Log in
-              </Button>
+              Stories
+            </Link>
+          </div>
+          <div className="w-full max-w-[340px] space-y-6 sm:max-w-md">
+            <Link
+              href="/"
+              className="font-login-label inline-flex items-center gap-1.5 text-sm font-bold text-primary transition-colors hover:underline"
+            >
+              <span aria-hidden>←</span>
+              Back to home
+            </Link>
+            <div className="space-y-1">
+              <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface lg:text-4xl">
+                Welcome back.
+              </h2>
+              <p className="text-on-surface-variant text-sm sm:text-base">Your narrative continues here.</p>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+              <div className="space-y-3">
+                <div>
+                  <label
+                    htmlFor="login-email"
+                    className="font-login-label mb-1 ml-3 block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase sm:text-xs"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="name@editorial.com"
+                    className="w-full rounded-full border-none bg-surface-container-highest px-5 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 transition-all focus:ring-2 focus:ring-primary/40 focus:outline-none sm:px-6 sm:text-base"
+                    aria-invalid={!!errors.email}
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="mt-0.5 ml-3 text-xs text-error sm:text-sm" role="alert">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="login-password"
+                    className="font-login-label mb-1 ml-3 block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase sm:text-xs"
+                  >
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      placeholder="••••••••"
+                      className="w-full rounded-full border-none bg-surface-container-highest px-5 py-3 pr-12 text-sm text-on-surface placeholder:text-on-surface-variant/40 transition-all focus:ring-2 focus:ring-primary/40 focus:outline-none sm:px-6 sm:pr-14 sm:text-base"
+                      aria-invalid={!!errors.password}
+                      {...register("password")}
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1/2 right-4 -translate-y-1/2 text-on-surface-variant/60 transition-colors hover:text-primary sm:right-5"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-4 sm:size-5" strokeWidth={1.75} />
+                      ) : (
+                        <Eye className="size-4 sm:size-5" strokeWidth={1.75} />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-0.5 ml-3 text-xs text-error sm:text-sm" role="alert">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 px-1">
+                <label className="group flex min-w-0 cursor-pointer items-center gap-1.5">
+                  <input
+                    type="checkbox"
+                    className="size-3.5 shrink-0 rounded border-outline-variant text-primary focus:ring-primary/30 sm:size-4"
+                  />
+                  <span className="text-on-surface-variant text-xs font-medium transition-colors group-hover:text-on-surface sm:text-sm">
+                    Remember me
+                  </span>
+                </label>
+                <Link
+                  href="#"
+                  className="shrink-0 text-xs font-bold text-primary transition-colors hover:text-primary-container sm:text-sm"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="font-headline w-full rounded-full bg-primary py-3.5 text-base font-bold text-on-primary shadow-lg shadow-primary/10 transition-all duration-300 hover:bg-primary-container active:scale-95 disabled:opacity-70 sm:py-4"
+              >
+                {isSubmitting ? "Signing in…" : "Sign In"}
+              </button>
             </form>
-            <p className="mt-[var(--spacing-lg)] text-center text-[0.875rem] text-dark/70">
-              No account?{" "}
-              <Link href="/register" className="font-semibold text-accent underline-offset-2 hover:underline">
-                Create one
-              </Link>
-            </p>
-          </CardInner>
+
+            <div className="pt-4 text-center sm:pt-5">
+              <p className="text-on-surface-variant text-sm sm:text-base">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/register"
+                  className="ml-1 font-bold text-on-surface underline decoration-primary/30 decoration-2 underline-offset-4 transition-colors hover:text-primary"
+                >
+                  Create an account
+                </Link>
+              </p>
+            </div>
+          </div>
         </section>
+      </main>
+
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-20 -left-20 size-72 rounded-full bg-tertiary-fixed-dim/20 blur-[80px] sm:size-80" />
+        <div className="absolute top-1/2 -right-36 size-72 rounded-full bg-primary-fixed-dim/10 blur-[100px] sm:-right-40 sm:size-80" />
       </div>
-    </main>
+
+      <Footer className="relative z-10 mt-auto shrink-0" />
+    </div>
   );
 }

@@ -1,24 +1,12 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BookOpen,
-  LayoutDashboard,
-  PenLine,
-  Shield,
-  House,
-} from "lucide-react";
+import { LayoutDashboard, LogOut, PenLine, Search, Shield } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { useAuthStore } from "@/store/authStore";
-import { Button } from "./button";
-
-const links = [
-  { href: "/", label: "Home", icon: House },
-  { href: "/dashboard", label: "Dashboard", auth: true, icon: LayoutDashboard },
-  { href: "/editor", label: "Write", auth: true, icon: PenLine },
-  { href: "/admin", label: "Admin", admin: true, icon: Shield },
-] as const;
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -27,176 +15,216 @@ function initials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+function signOut() {
+  useAuthStore.getState().clearAuth();
+  window.location.href = "/";
+}
+
+const navLink =
+  "font-headline text-base font-bold transition-colors duration-300 md:text-lg";
+
 export function Navbar() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const visible = links.filter((l) => {
-    if ("admin" in l && l.admin) return user?.role === "ADMIN";
-    if ("auth" in l && l.auth) return !!user;
-    return true;
-  });
+  const exploreActive = pathname === "/";
 
-  const linkClass = (href: string) => {
-    const active = pathname === href;
-    return cn(
-      "inline-flex items-center gap-2 whitespace-nowrap rounded-[var(--radius-pill)] px-4 py-2 text-[0.8125rem] font-semibold no-underline transition-[background,color,box-shadow,transform] duration-[var(--motion-fast)] ease-[var(--motion-ease)]",
-      active
-        ? "bg-accent text-white shadow-[0_2px_12px_rgba(244,54,81,0.35)]"
-        : "text-dark/75 hover:bg-dark/[0.07] hover:text-dark active:scale-[0.98]",
-    );
-  };
+  useEffect(() => {
+    if (!profileOpen) return;
+    const onDocDown = (e: MouseEvent) => {
+      const el = profileMenuRef.current;
+      if (el && !el.contains(e.target as Node)) setProfileOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setProfileOpen(false);
+    };
+    document.addEventListener("mousedown", onDocDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [profileOpen]);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40 border-b border-dark/10",
-        "bg-[color-mix(in_srgb,var(--color-white)_88%,var(--color-surface))]",
-        "shadow-[0_6px_28px_rgba(22,22,22,0.06)]",
-        "supports-[backdrop-filter]:bg-white/75 supports-[backdrop-filter]:backdrop-blur-md",
-      )}
-    >
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-accent/90 to-transparent opacity-80"
-        aria-hidden
-      />
-
-      <div className="container-design flex min-h-[68px] flex-col gap-2 py-2 md:flex-row md:items-center md:justify-between md:gap-[var(--spacing-lg)] md:py-0 md:pt-0">
-        <div className="flex min-h-[52px] items-center justify-between gap-3 md:min-h-0">
+    <nav className="sticky top-0 z-50 bg-editorial-surface transition-colors duration-300 dark:bg-[#161616]">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-5 py-3 sm:px-8 sm:py-4">
+        <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="group flex shrink-0 items-center gap-2.5 rounded-[var(--radius-pill)] py-1 pl-1 pr-1 no-underline transition-transform duration-[var(--motion-fast)] hover:scale-[1.02] active:scale-[0.98]"
+            className="font-headline text-2xl font-black tracking-tighter text-primary dark:text-[#f43651] sm:text-3xl"
           >
-            <span
-              className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-pill)] bg-accent text-white shadow-[var(--shadow-card)] ring-2 ring-white transition-[box-shadow,transform] group-hover:shadow-[var(--shadow-card-hover)]"
-              aria-hidden
-            >
-              <BookOpen className="size-[1.15rem]" strokeWidth={2.25} />
-            </span>
-            <span className="font-hero text-[1.1rem] font-bold tracking-[0.03em] text-dark">
-              STORIES
-            </span>
+            Stories
           </Link>
 
-          <div className="flex items-center gap-2 md:hidden">
-            {user ? (
+          <div className="hidden items-center gap-6 md:flex md:gap-8">
+            <Link
+              href="/"
+              className={cn(
+                navLink,
+                exploreActive
+                  ? "border-b-2 border-primary pb-1 text-primary dark:text-[#f43651]"
+                  : "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+              )}
+            >
+              Explore
+            </Link>
+            <Link
+              href="/#short-stories"
+              className={cn(
+                navLink,
+                "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+              )}
+            >
+              Short stories
+            </Link>
+            {user && (
               <>
-                <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/12 text-[0.65rem] font-bold text-accent ring-2 ring-accent/20"
+                <Link
+                  href="/editor"
+                  className={cn(
+                    navLink,
+                    pathname === "/editor"
+                      ? "border-b-2 border-primary pb-1 text-primary"
+                      : "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+                  )}
+                >
+                  Write
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    navLink,
+                    pathname === "/dashboard"
+                      ? "border-b-2 border-primary pb-1 text-primary"
+                      : "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+                  )}
+                >
+                  Dashboard
+                </Link>
+                {user.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className={cn(
+                      navLink,
+                      pathname === "/admin"
+                        ? "border-b-2 border-primary pb-1 text-primary"
+                        : "text-on-surface opacity-80 hover:text-primary dark:text-[#e7e7d8]",
+                    )}
+                  >
+                    Admin
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button
+              type="button"
+              className="text-on-surface transition-colors hover:text-primary dark:text-[#e7e7d8]"
+              aria-label="Search"
+              onClick={() => toast.message("Search is coming soon.")}
+            >
+              <Search className="size-6" strokeWidth={2} />
+            </button>
+            {user ? (
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary/15 text-[0.65rem] font-bold text-primary ring-2 ring-primary/20 transition-colors hover:bg-primary/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-10 sm:text-[0.7rem]"
                   title={user.name}
+                  aria-expanded={profileOpen}
+                  aria-haspopup="menu"
+                  aria-label={`Account menu for ${user.name}`}
+                  onClick={() => setProfileOpen((o) => !o)}
                 >
                   {initials(user.name)}
-                </span>
-                <Button
-                  variant="ghost"
-                  className="!min-h-9 !px-3 !py-2 !text-[0.8rem]"
-                  onClick={() => {
-                    useAuthStore.getState().clearAuth();
-                    window.location.href = "/";
-                  }}
-                >
-                  Out
-                </Button>
-              </>
+                </button>
+                {profileOpen ? (
+                  <div
+                    className="absolute right-0 z-60 mt-2 w-56 rounded-xl border border-outline-variant/20 bg-editorial-surface py-2 editorial-shadow dark:border-white/10 dark:bg-[#1e1e1e]"
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    <div className="border-b border-outline-variant/15 px-3 pb-2 dark:border-white/10">
+                      <p className="truncate font-headline text-sm font-bold text-on-surface dark:text-[#e7e7d8]">
+                        {user.name}
+                      </p>
+                      <p className="truncate text-xs text-on-surface/70 dark:text-[#e7e7d8]/65">
+                        {user.email}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-bold text-on-surface transition-colors hover:bg-primary/10 hover:text-primary dark:text-[#e7e7d8]"
+                      onClick={() => {
+                        setProfileOpen(false);
+                        signOut();
+                      }}
+                    >
+                      <LogOut className="size-4 shrink-0 opacity-80" aria-hidden />
+                      Sign out
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="!min-h-9 !px-3 !py-2 !text-[0.8rem]">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="accent" className="!min-h-9 !px-4 !py-2 !text-[0.8rem]">
-                    Join
-                  </Button>
-                </Link>
-              </>
+              <Link
+                href="/register"
+                className="scale-95 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-on-primary shadow-lg shadow-primary/10 transition-transform active:scale-90 sm:px-8 sm:py-3"
+              >
+                Get Started
+              </Link>
             )}
           </div>
         </div>
 
-        <nav
-          className="hidden flex-1 items-center justify-center gap-1.5 md:flex md:px-4"
-          aria-label="Main"
-        >
-          {visible.map((l) => {
-            const Icon = l.icon;
-            const active = pathname === l.href;
-            return (
-              <Link key={l.href} href={l.href} className={linkClass(l.href)}>
-                <Icon
-                  className={cn("size-3.5 shrink-0", active ? "text-white" : "text-dark/50")}
-                  strokeWidth={2.25}
-                  aria-hidden
-                />
-                {l.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <nav
-          className="flex gap-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
-          aria-label="Main mobile"
-        >
-          {visible.map((l) => {
-            const Icon = l.icon;
-            const active = pathname === l.href;
-            return (
-              <Link key={l.href} href={l.href} className={linkClass(l.href)}>
-                <Icon
-                  className={cn("size-3.5 shrink-0", active ? "text-white" : "text-dark/50")}
-                  strokeWidth={2.25}
-                  aria-hidden
-                />
-                {l.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="hidden items-center gap-3 border-l border-dark/10 pl-4 md:flex">
-          {user ? (
+        {/* Mobile nav */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-outline-variant/20 pt-3 md:hidden">
+          <Link
+            href="/"
+            className={cn(
+              "text-sm font-bold",
+              exploreActive ? "text-primary" : "text-on-surface/80",
+            )}
+          >
+            Explore
+          </Link>
+          <Link href="/#short-stories" className="text-sm font-bold text-on-surface/80">
+            Short stories
+          </Link>
+          {user && (
             <>
-              <span className="hidden max-w-[120px] truncate text-right text-[0.8125rem] font-semibold text-dark md:inline lg:max-w-[180px]">
-                {user.name}
-              </span>
-              <span
-                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-[0.7rem] font-bold text-accent ring-2 ring-accent/15"
-                title={user.name}
-              >
-                {initials(user.name)}
-              </span>
-              <Button
-                variant="ghost"
-                className="!border-[1.5px] !border-dark/12 !py-2 !text-[0.8125rem]"
-                onClick={() => {
-                  useAuthStore.getState().clearAuth();
-                  window.location.href = "/";
-                }}
-              >
-                Sign out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  className="!border-[1.5px] !border-dark/12 !py-2 !text-[0.8125rem]"
-                >
-                  Log in
-                </Button>
+              <Link href="/editor" className="inline-flex items-center gap-1 text-sm font-bold text-on-surface/80">
+                <PenLine className="size-3.5" />
+                Write
               </Link>
-              <Link href="/register">
-                <Button variant="accent" className="!px-6 !py-2 !text-[0.8125rem]">
-                  Get started
-                </Button>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1 text-sm font-bold text-on-surface/80"
+              >
+                <LayoutDashboard className="size-3.5" />
+                Dash
               </Link>
+              {user.role === "ADMIN" && (
+                <Link href="/admin" className="inline-flex items-center gap-1 text-sm font-bold text-on-surface/80">
+                  <Shield className="size-3.5" />
+                  Admin
+                </Link>
+              )}
             </>
+          )}
+          {!user && (
+            <Link href="/login" className="ml-auto text-sm font-bold text-primary">
+              Log in
+            </Link>
           )}
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
