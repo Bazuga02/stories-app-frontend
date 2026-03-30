@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,6 +38,8 @@ export function RegisterPageClient() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const showPrivacy = useLegalModalStore((s) => s.showPrivacy);
   const showTerms = useLegalModalStore((s) => s.showTerms);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -61,25 +65,10 @@ export function RegisterPageClient() {
   const inputClass =
     "w-full rounded-full border-none bg-surface-container-highest px-5 py-3 text-sm font-medium text-on-background placeholder:text-on-surface-variant/50 transition-all focus:ring-2 focus:ring-primary/40 focus:outline-none sm:px-6 sm:text-base";
 
-  return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <header className="top-0 z-50 w-full shrink-0 bg-editorial-surface">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-6 md:py-5">
-          <Link
-            href="/"
-            className="font-headline text-xl font-black tracking-tighter text-on-surface transition-colors hover:text-primary md:text-2xl"
-          >
-            Stories
-          </Link>
-          <Link
-            href="/"
-            className="font-login-label text-sm font-bold text-primary transition-colors hover:underline"
-          >
-            Home
-          </Link>
-        </div>
-      </header>
+  const passwordInputClass = `${inputClass} pr-12 sm:pr-14`;
 
+  return (
+    <div className="flex w-full flex-col md:min-h-0 md:flex-1">
       <main className="flex grow items-center justify-center px-3 py-6 sm:px-4 md:py-10">
         <div className="editorial-shadow grid w-full max-w-5xl grid-cols-1 gap-0 overflow-hidden rounded-editorial-lg bg-surface-container-low lg:max-w-6xl lg:grid-cols-2 lg:rounded-editorial-xl">
           {/* Side A */}
@@ -201,15 +190,29 @@ export function RegisterPageClient() {
                 >
                   Password
                 </label>
-                <input
-                  id="reg-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  className={inputClass}
-                  aria-invalid={!!errors.password}
-                  {...register("password")}
-                />
+                <div className="relative">
+                  <input
+                    id="reg-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    className={passwordInputClass}
+                    aria-invalid={!!errors.password}
+                    {...register("password")}
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-1/2 right-4 -translate-y-1/2 text-on-surface-variant/60 transition-colors hover:text-primary sm:right-5"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4 sm:size-5" strokeWidth={1.75} />
+                    ) : (
+                      <Eye className="size-4 sm:size-5" strokeWidth={1.75} />
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="ml-3 text-xs text-error sm:ml-4 sm:text-sm" role="alert">
                     {errors.password.message}
@@ -223,15 +226,29 @@ export function RegisterPageClient() {
                 >
                   Confirm password
                 </label>
-                <input
-                  id="reg-confirm"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  className={inputClass}
-                  aria-invalid={!!errors.confirm}
-                  {...register("confirm")}
-                />
+                <div className="relative">
+                  <input
+                    id="reg-confirm"
+                    type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    className={passwordInputClass}
+                    aria-invalid={!!errors.confirm}
+                    {...register("confirm")}
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-1/2 right-4 -translate-y-1/2 text-on-surface-variant/60 transition-colors hover:text-primary sm:right-5"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="size-4 sm:size-5" strokeWidth={1.75} />
+                    ) : (
+                      <Eye className="size-4 sm:size-5" strokeWidth={1.75} />
+                    )}
+                  </button>
+                </div>
                 {errors.confirm && (
                   <p className="ml-3 text-xs text-error sm:ml-4 sm:text-sm" role="alert">
                     {errors.confirm.message}

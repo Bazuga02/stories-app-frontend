@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-
 /**
- * Full-screen auth UI: prevents the main document from scrolling (navbar + footer
- * still mount in the root layout, so without this their stacked height + an h-screen
- * spacer causes a body scrollbar). Inner content scrolls only when it exceeds the viewport.
+ * Auth UI fills the viewport below the sticky navbar (navbar stays visible for nav /
+ * hamburger). Inner content scrolls when it exceeds the panel height.
  */
 export function AuthFullscreenShell({
   className,
@@ -14,22 +11,9 @@ export function AuthFullscreenShell({
   className?: string;
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtml = html.style.overflow;
-    const prevBody = body.style.overflow;
-    html.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-    return () => {
-      html.style.overflow = prevHtml;
-      body.style.overflow = prevBody;
-    };
-  }, []);
-
   return (
     <div
-      className={`fixed inset-0 z-100 flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden ${className ?? ""}`}
+      className={`fixed inset-x-0 top-14 z-40 flex h-[calc(100dvh-3.5rem)] max-h-[calc(100dvh-3.5rem)] min-h-0 flex-col overflow-hidden sm:top-16 sm:h-[calc(100dvh-4rem)] sm:max-h-[calc(100dvh-4rem)] ${className ?? ""}`}
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain">
         {children}

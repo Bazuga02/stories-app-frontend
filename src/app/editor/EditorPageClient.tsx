@@ -16,7 +16,6 @@ import {
   updateStory,
 } from "@/services/stories.service";
 import { getApiErrorMessage } from "@/services/api";
-import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loader";
 import { Modal } from "@/components/ui/modal";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
@@ -27,6 +26,10 @@ import {
 import { cn } from "@/lib/cn";
 import { Footer } from "@/components/ui/footer";
 import { randomPicsumCoverCandidates } from "@/lib/picsum";
+import {
+  EDITOR_TIP_IMAGE,
+  pickRandomEditorTip,
+} from "@/lib/editor-tips";
 
 const schema = z.object({
   title: z.string().max(200),
@@ -34,9 +37,6 @@ const schema = z.object({
 });
 
 type Form = z.infer<typeof schema>;
-
-const TIP_IMG =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDRwf2vuWjVGMnzgAbLEfIcRJ0vEVbWjPVTBKsCmL3y73P4EJVMwE3c_6gLREGhiFCxAscDx-1RSwMJxbQ9YNGzl58aK9aneq4FlgZDguXte1mtl3RRw4PCw7XO19g_SEMlg9SANg9qu7qqb09ZcgBDpvT7NPYOR9QG44z6-9SqHYHohSvk1bGqpvtW5tesDUbTF_r50x02vIVof4En5--Wm1m-P_KO_WAvZn7n4CUrVfS2DoJJtGKDFy5H0v_nG6QC3m2L4--H0zU";
 
 function normalizeInternalHref(href: string): string {
   if (href.startsWith("/")) {
@@ -92,6 +92,7 @@ export function EditorPageClient() {
   const richRootRef = useRef<HTMLDivElement>(null);
   const [tags, setTags] = useState<string[]>(["Minimalism", "Lifestyle"]);
   const [tagInput, setTagInput] = useState("");
+  const [editorTip] = useState(() => pickRandomEditorTip());
 
   const {
     register,
@@ -371,7 +372,7 @@ export function EditorPageClient() {
               <button
                 type="button"
                 disabled={saving}
-                className="font-headline text-base font-bold text-[#161616] opacity-80 transition-transform hover:text-primary active:scale-95 disabled:opacity-50 dark:text-[#e7e7d8] lg:text-lg"
+                className="font-headline text-base font-bold text-black transition-transform hover:text-primary active:scale-95 disabled:opacity-50 lg:text-lg"
                 onClick={() => void saveDraftNow()}
               >
                 {saving ? "Saving…" : "Save Draft"}
@@ -402,14 +403,12 @@ export function EditorPageClient() {
           <div className="fixed right-8 top-40 z-10 hidden w-64 rotate-3 rounded-editorial-xl bg-surface-container-low p-4 shadow-lg transition-transform duration-500 hover:rotate-0 lg:block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={TIP_IMG}
-              alt="Fountain pen on paper"
+              src={EDITOR_TIP_IMAGE}
+              alt={editorTip.imageAlt}
               className="mb-4 h-40 w-full rounded-lg object-cover"
             />
             <p className="font-headline mb-1 text-xs font-bold text-primary">EDITOR&apos;S TIP</p>
-            <p className="text-xs leading-relaxed text-on-surface-variant">
-              Let the white space breathe. Great stories need room to grow between the lines.
-            </p>
+            <p className="text-xs leading-relaxed text-on-surface-variant">{editorTip.body}</p>
           </div>
 
           <div className="mx-auto max-w-4xl px-5 pt-8 pb-16 sm:px-6 sm:pt-12 sm:pb-24">
@@ -526,9 +525,10 @@ export function EditorPageClient() {
         open={coverPickerOpen}
         onClose={() => setCoverPickerOpen(false)}
         title="Choose cover image"
+        variant="editorial"
         className="max-w-2xl"
       >
-        <p className="mb-4 text-sm leading-relaxed text-on-surface-variant">
+        <p className="mb-4 font-login-body text-sm leading-relaxed text-on-secondary-container sm:text-base">
           Pick one image for the story banner (feed and story page). It is not inserted into the
           article text.
         </p>
@@ -555,25 +555,44 @@ export function EditorPageClient() {
         </div>
       </Modal>
 
-      <Modal open={leaveModalOpen} onClose={handleLeaveCancel} title="Save draft?">
-        <p className="mb-[var(--spacing-lg)] text-[0.95rem] leading-relaxed text-dark/80">
+      <Modal
+        open={leaveModalOpen}
+        onClose={handleLeaveCancel}
+        title="Save draft?"
+        variant="editorial"
+      >
+        <p className="mb-6 font-login-body text-sm leading-relaxed text-on-secondary-container sm:text-base">
           You have unsaved changes. Save your draft before leaving, or leave without saving.
         </p>
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-          <Button type="button" variant="ghost" onClick={handleLeaveCancel}>
-            Cancel
-          </Button>
-          <Button type="button" variant="ghost" onClick={handleLeaveDiscard}>
-            Leave without saving
-          </Button>
-          <Button
+        <div className="flex flex-row flex-nowrap items-center justify-end gap-2 overflow-x-auto">
+          <button
             type="button"
-            variant="accent"
-            isLoading={saving}
+            className="shrink-0 rounded-full border border-outline-variant/35 px-4 py-2.5 font-headline text-xs font-bold text-on-background transition-colors hover:border-primary/40 hover:bg-primary/8 hover:text-primary sm:px-5 sm:text-sm"
+            onClick={handleLeaveCancel}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="shrink-0 rounded-full border border-outline-variant/25 px-4 py-2.5 font-headline text-xs font-bold text-on-secondary-container transition-colors hover:border-error/35 hover:bg-error/8 hover:text-error sm:px-5 sm:text-sm"
+            onClick={handleLeaveDiscard}
+          >
+            Leave without saving
+          </button>
+          <button
+            type="button"
+            disabled={saving}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-headline text-xs font-bold text-on-primary shadow-md transition-all hover:bg-primary-container disabled:pointer-events-none disabled:opacity-60 sm:px-6 sm:text-sm"
             onClick={() => void handleLeaveSave()}
           >
+            {saving ? (
+              <span
+                className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                aria-hidden
+              />
+            ) : null}
             Save draft
-          </Button>
+          </button>
         </div>
       </Modal>
     </>

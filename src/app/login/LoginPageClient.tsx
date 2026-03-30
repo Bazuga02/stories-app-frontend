@@ -46,39 +46,41 @@ export function LoginPageClient() {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden text-on-surface md:flex-row">
+    <div className="flex w-full flex-col md:min-h-0 md:flex-1">
+      <main className="flex w-full flex-col text-on-surface md:min-h-0 md:flex-1 md:flex-row md:overflow-hidden">
         {/* Left: illustration */}
-        <section className="relative hidden w-full flex-col items-center justify-center overflow-hidden bg-surface-container-low p-6 md:flex md:w-1/2 md:p-8 lg:w-[55%]">
-          <div className="absolute top-14 left-14 text-primary opacity-20">
-            <Star aria-hidden className="size-12" strokeWidth={1.25} />
+        <section className="relative hidden w-full flex-col items-center justify-center overflow-hidden bg-surface-container-low p-6 md:flex md:w-1/2 md:p-7 lg:w-[55%]">
+          <div className="absolute top-12 left-12 text-primary opacity-20 md:top-14 md:left-14">
+            <Star aria-hidden className="size-11 md:size-12" strokeWidth={1.25} />
           </div>
-          <div className="absolute right-8 bottom-32 rotate-12 text-tertiary-container opacity-20">
-            <Sparkles aria-hidden className="size-18" strokeWidth={1.25} />
+          <div className="absolute right-7 bottom-28 rotate-12 text-tertiary-container opacity-20 md:bottom-26">
+            <Sparkles aria-hidden className="size-13 md:size-17" strokeWidth={1.25} />
           </div>
           <div className="relative z-10 w-full max-w-lg lg:max-w-xl">
             <div className="editorial-cloud -rotate-2 transform bg-surface-container-lowest p-2 shadow-2xl">
               <Lottie
                 animationData={loginAnimation}
                 loop
-                className="h-[min(44vh,440px)] w-full md:h-[420px] lg:h-[480px] [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain"
+                className="h-[min(40vh,380px)] w-full md:h-[380px] lg:h-[440px] [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain"
                 aria-label="Animated illustration for Stories sign-in"
               />
             </div>
-            <div className="absolute -right-5 -bottom-6 max-w-[220px] rotate-3 rounded-editorial border border-outline-variant/10 bg-surface-container-lowest p-4 shadow-xl sm:max-w-xs sm:p-5">
-              <Quote aria-hidden className="mb-1.5 size-6 text-primary" strokeWidth={2} />
-              <p className="font-headline text-base leading-snug text-on-surface sm:text-lg">
+            <div className="absolute -right-3 -bottom-2 max-w-[190px] -translate-y-2 rotate-3 rounded-editorial border border-outline-variant/10 bg-surface-container-lowest p-3 shadow-lg sm:max-w-[220px] sm:p-4 sm:-translate-y-3">
+              <Quote aria-hidden className="mb-1 size-5 text-primary" strokeWidth={2} />
+              <p className="font-headline text-sm leading-snug text-on-surface sm:text-base">
                 Every word is a <span className="text-primary">new world</span> waiting to be built.
               </p>
-              <div className="mt-2.5 flex items-center gap-2">
-                <div className="size-6 rounded-full bg-secondary-fixed sm:size-7" />
-                <span className="text-on-secondary-container text-[10px] font-bold tracking-widest uppercase sm:text-xs">
-                  The Editorial Team
+              <div className="mt-2 flex items-center gap-1.5">
+                <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[0.5rem] font-bold tabular-nums text-primary sm:size-6 sm:text-[0.55rem]">
+                  AR
+                </div>
+                <span className="text-on-secondary-container text-[9px] font-bold tracking-wide sm:text-[10px]">
+                  Abhishek Rai
                 </span>
               </div>
             </div>
           </div>
-          <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
+          <div className="absolute bottom-6 left-6 md:bottom-7 md:left-7">
             <Link
               href="/"
               className="font-headline text-3xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container"
@@ -89,16 +91,8 @@ export function LoginPageClient() {
         </section>
 
         {/* Right: form */}
-        <section className="relative flex w-full flex-col items-center justify-center bg-editorial-surface px-5 py-10 pt-16 md:w-1/2 md:px-10 md:py-12 lg:w-[45%] lg:px-12">
-          <div className="absolute top-5 left-5 md:hidden">
-            <Link
-              href="/"
-              className="font-headline text-xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container"
-            >
-              Stories
-            </Link>
-          </div>
-          <div className="w-full max-w-[340px] space-y-6 sm:max-w-md">
+        <section className="relative flex w-full shrink-0 flex-col items-center justify-start bg-editorial-surface px-5 pb-10 pt-5 md:min-h-0 md:w-1/2 md:justify-center md:px-10 md:pb-12 md:pt-12 lg:w-[45%] lg:px-12">
+          <div className="w-full max-w-[340px] space-y-4 pb-6 sm:max-w-md sm:space-y-6 md:space-y-6 md:pb-0">
             <Link
               href="/"
               className="font-login-label inline-flex items-center gap-1.5 text-sm font-bold text-primary transition-colors hover:underline"
@@ -107,13 +101,13 @@ export function LoginPageClient() {
               Back to home
             </Link>
             <div className="space-y-1">
-              <h2 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface lg:text-4xl">
+              <h2 className="font-headline text-2xl font-extrabold tracking-tight text-on-surface sm:text-3xl lg:text-4xl">
                 Welcome back.
               </h2>
               <p className="text-on-surface-variant text-sm sm:text-base">Your narrative continues here.</p>
             </div>
 
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className="space-y-3">
                 <div>
                   <label
@@ -201,13 +195,23 @@ export function LoginPageClient() {
               >
                 {isSubmitting ? "Signing in…" : "Sign In"}
               </button>
+
+              <p className="text-center text-on-surface-variant text-sm sm:text-base md:hidden">
+                New to Stories?{" "}
+                <Link
+                  href={next !== "/" ? `/register?next=${encodeURIComponent(next)}` : "/register"}
+                  className="font-headline font-bold text-primary underline decoration-primary/40 decoration-2 underline-offset-[5px] transition-colors hover:text-primary-container"
+                >
+                  Create an account
+                </Link>
+              </p>
             </form>
 
-            <div className="pt-4 text-center sm:pt-5">
+            <div className="hidden pt-2 text-center md:block md:pt-5">
               <p className="text-on-surface-variant text-sm sm:text-base">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href="/register"
+                  href={next !== "/" ? `/register?next=${encodeURIComponent(next)}` : "/register"}
                   className="ml-1 font-bold text-on-surface underline decoration-primary/30 decoration-2 underline-offset-4 transition-colors hover:text-primary"
                 >
                   Create an account
@@ -223,7 +227,7 @@ export function LoginPageClient() {
         <div className="absolute top-1/2 -right-36 size-72 rounded-full bg-primary-fixed-dim/10 blur-[100px] sm:-right-40 sm:size-80" />
       </div>
 
-      <Footer className="relative z-10 mt-auto shrink-0" />
+      <Footer className="relative z-10 mt-auto w-full shrink-0 py-6 sm:py-8 md:py-12" />
     </div>
   );
 }

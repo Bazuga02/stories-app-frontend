@@ -5,6 +5,7 @@ import { LegalDocumentModals } from "@/components/legal/LegalDocumentModals";
 import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
 import { useLegalModalStore } from "@/store/legalModalStore";
 import { AuthReadyProvider } from "./auth-ready-context";
+import { QueryProvider } from "./query-provider";
 
 function GlobalLegalModals() {
   const open = useLegalModalStore((s) => s.open);
@@ -16,10 +17,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const ready = useAuthBootstrap();
 
   return (
-    <AuthReadyProvider ready={ready}>
-      {children}
-      <GlobalLegalModals />
-      <Toaster
+    <QueryProvider>
+      <AuthReadyProvider ready={ready}>
+        {children}
+        <GlobalLegalModals />
+        <Toaster
         position="top-center"
         toastOptions={{
           classNames: {
@@ -30,6 +32,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           },
         }}
       />
-    </AuthReadyProvider>
+      </AuthReadyProvider>
+    </QueryProvider>
   );
 }

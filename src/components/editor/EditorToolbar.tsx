@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, type RefObject } from "react";
+import { useState, type CSSProperties, type RefObject } from "react";
 import {
   Bold,
   Heading2,
@@ -9,13 +9,33 @@ import {
   Italic,
   List,
   Quote,
-  Settings,
   Smile,
 } from "lucide-react";
 import { Theme, EmojiStyle, type EmojiClickData } from "emoji-picker-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { replaceSelection, wrapSelection } from "./markdownSelection";
+
+/** CSS variables for emoji-picker-react — editorial surface + primary accent. */
+const EDITORIAL_EMOJI_PICKER_VARS = {
+  "--epr-bg-color": "var(--color-editorial-surface)",
+  "--epr-highlight-color": "var(--color-accent)",
+  "--epr-hover-bg-color": "color-mix(in srgb, var(--color-accent) 14%, var(--color-editorial-surface))",
+  "--epr-hover-bg-color-reduced-opacity": "color-mix(in srgb, var(--color-accent) 10%, transparent)",
+  "--epr-focus-bg-color": "color-mix(in srgb, var(--color-accent) 18%, var(--color-editorial-surface))",
+  "--epr-text-color": "var(--color-on-secondary-container)",
+  "--epr-search-input-bg-color": "var(--color-surface)",
+  "--epr-search-input-text-color": "var(--color-on-background)",
+  "--epr-search-input-placeholder-color": "var(--color-on-secondary-container)",
+  "--epr-picker-border-color": "color-mix(in srgb, var(--color-on-background) 12%, transparent)",
+  "--epr-category-label-bg-color": "color-mix(in srgb, var(--color-editorial-surface) 92%, transparent)",
+  "--epr-category-label-text-color": "var(--color-on-secondary-container)",
+  "--epr-category-icon-active-color": "var(--color-accent)",
+  "--epr-emoji-hover-color": "color-mix(in srgb, var(--color-accent) 12%, var(--color-editorial-surface))",
+  "--epr-emoji-variation-indicator-color": "color-mix(in srgb, var(--color-on-background) 18%, transparent)",
+  "--epr-emoji-variation-indicator-color-hover": "var(--color-on-secondary-container)",
+  "--epr-picker-border-radius": "var(--radius-editorial)",
+} as CSSProperties;
 
 const EmojiPickerLazy = dynamic(
   () => import("emoji-picker-react").then((m) => m.default),
@@ -172,13 +192,14 @@ export function EditorToolbar({
               "absolute z-80 overflow-hidden rounded-editorial-lg border border-outline-variant/30 shadow-xl",
               pickerClass,
             )}
+            style={EDITORIAL_EMOJI_PICKER_VARS}
             role="dialog"
             aria-label="Emoji picker"
           >
             <EmojiPickerLazy
               width={300}
               height={380}
-              theme={Theme.AUTO}
+              theme={Theme.LIGHT}
               emojiStyle={EmojiStyle.NATIVE}
               lazyLoadEmojis
               searchPlaceholder="Search emojis…"
@@ -227,17 +248,6 @@ export function EditorToolbar({
             "bottom-full left-1/2 mb-2 h-[380px] w-[300px] max-w-[min(100vw-2rem,300px)] -translate-x-1/2",
             "z-[70]",
           )}
-        </div>
-        <div className="mx-1 h-8 w-px bg-outline-variant/30" aria-hidden />
-        <div className="flex items-center px-0.5 md:px-1">
-          <button
-            type="button"
-            className={toolBtnFloat}
-            title="Settings"
-            onClick={() => toast.message("Editor settings coming soon.")}
-          >
-            <Settings className="size-5" strokeWidth={2} />
-          </button>
         </div>
       </div>
     );

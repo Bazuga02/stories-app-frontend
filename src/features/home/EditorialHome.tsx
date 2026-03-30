@@ -103,8 +103,8 @@ export function EditorialHome() {
                   <Mic className="size-4" strokeWidth={2} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-on-tertiary-fixed">Now Listening</p>
-                  <p className="text-xs opacity-70">The Glass Library — 12 min</p>
+                  <p className="text-sm font-bold text-on-tertiary-fixed">Text-to-speech available</p>
+                  <p className="text-xs opacity-70">You can listen to your stories.</p>
                 </div>
               </div>
             </div>

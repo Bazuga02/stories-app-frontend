@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   Bookmark,
@@ -26,6 +27,7 @@ import {
 } from "@/services/bookmarks.service";
 import { cn } from "@/lib/cn";
 import { STORY_COVER_PLACEHOLDER } from "@/lib/picsum";
+import { estimateReadMinutes, userInitial } from "@/features/story/story-page-utils";
 
 const FULL_PAGE_SIZE = 10;
 const COMPACT_PAGE_SIZE = 4;
@@ -36,16 +38,6 @@ export type HomeFeedProps = {
   /** Full list only; ignored when `compact` */
   sort?: "latest" | "likes";
 };
-
-function estimateReadMinutes(content: string) {
-  const words = content.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.ceil(words / 200));
-}
-
-function authorInitial(name: string) {
-  const t = name.trim();
-  return t ? t[0]!.toUpperCase() : "?";
-}
 
 function EditorialFeedCardSkeleton() {
   return (
@@ -65,62 +57,47 @@ function EditorialFeedCardSkeleton() {
 }
 
 export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
-  const [items, setItems] = useState<Story[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((s) => s.user);
   const toggleBookmarkLocal = useBookmarkStore((s) => s.toggle);
   const bookmarkIds = useBookmarkStore((s) => s.ids);
 
-  const fetchPage = useCallback(
-    async (p: number) => {
-      if (compact) {
-        return listPublishedStories({ page: p, pageSize: COMPACT_PAGE_SIZE });
-      }
-      if (sort === "likes") {
-        return listTrendingStories({ page: p, pageSize: FULL_PAGE_SIZE });
-      }
-      return listPublishedStories({ page: p, pageSize: FULL_PAGE_SIZE });
-    },
-    [compact, sort],
-  );
+  /** Home (compact) uses latest only; same cache key as /stories?sort=latest first page. */
+  const querySort = compact ? "latest" : sort;
 
-  const load = useCallback(
-    async (p: number, append: boolean) => {
-      if (append) setLoadingMore(true);
-      else setLoading(true);
-      try {
-        const res = await fetchPage(p);
-        const pageSizeUsed = compact ? COMPACT_PAGE_SIZE : FULL_PAGE_SIZE;
-        setItems((prev) => {
-          const chunk = res.items;
-          const merged = append ? [...prev, ...chunk] : chunk;
-          const seen = new Set<string>();
-          return merged.filter((s) =>
-            seen.has(s.id) ? false : (seen.add(s.id), true),
-          );
-        });
-        const tp =
-          res.totalPages ??
-          Math.max(1, Math.ceil(res.total / (res.pageSize || pageSizeUsed)));
-        setTotalPages(tp);
-        setPage(res.page);
-      } catch (e) {
-        toast.error(getApiErrorMessage(e, "Could not load stories"));
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
+  const {
+    data,
+    error,
+    isPending,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["stories", "feed", querySort],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }) => {
+      const page = pageParam as number;
+      if (querySort === "likes") {
+        return listTrendingStories({ page, pageSize: FULL_PAGE_SIZE });
       }
+      return listPublishedStories({ page, pageSize: FULL_PAGE_SIZE });
     },
-    [compact, fetchPage],
-  );
+    getNextPageParam: (lastPage) => {
+      const page = lastPage.page ?? 1;
+      const pageSize = lastPage.pageSize ?? FULL_PAGE_SIZE;
+      const totalPages =
+        lastPage.totalPages ??
+        Math.max(1, Math.ceil(lastPage.total / pageSize));
+      return page < totalPages ? page + 1 : undefined;
+    },
+    /** Show prior list while Latest ↔ Most likes loads (no full skeleton flash). */
+    placeholderData: keepPreviousData,
+  });
 
   useEffect(() => {
-    void load(1, false);
-  }, [load]);
+    if (!error) return;
+    toast.error(getApiErrorMessage(error, "Could not load stories"));
+  }, [error]);
 
   useEffect(() => {
     if (compact) return;
@@ -129,15 +106,24 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
     const obs = new IntersectionObserver(
       (entries) => {
         const hit = entries[0]?.isIntersecting;
-        if (!hit || loading || loadingMore) return;
-        if (page >= totalPages) return;
-        void load(page + 1, true);
+        if (!hit || isFetchingNextPage || !hasNextPage) return;
+        void fetchNextPage();
       },
       { rootMargin: "120px" },
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [compact, load, loading, loadingMore, page, totalPages]);
+  }, [compact, fetchNextPage, isFetchingNextPage, hasNextPage]);
+
+  const allItems =
+    data?.pages.flatMap((p) => p.items).filter(Boolean) ?? ([] as Story[]);
+  const seen = new Set<string>();
+  const deduped = allItems.filter((s) =>
+    seen.has(s.id) ? false : (seen.add(s.id), true),
+  );
+  const items = compact
+    ? deduped.slice(0, COMPACT_PAGE_SIZE)
+    : deduped;
 
   const syncBookmarkApi = async (e: React.MouseEvent, story: Story) => {
     e.preventDefault();
@@ -163,7 +149,7 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
     }
   };
 
-  if (loading) {
+  if (isPending && !data) {
     return (
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -173,7 +159,19 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
     );
   }
 
-  if (items.length === 0) {
+  if (error || items.length === 0) {
+    if (error) {
+      return (
+        <div className="rounded-xl bg-surface-container-low p-10 text-center editorial-shadow">
+          <p className="font-headline text-lg font-bold text-on-surface">
+            Couldn&apos;t load stories
+          </p>
+          <p className="mt-2 font-login-body text-sm text-on-secondary-container">
+            Check your connection and try again.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="rounded-xl bg-surface-container-low p-10 text-center editorial-shadow">
         <p className="font-headline text-lg font-bold text-on-surface">
@@ -216,7 +214,10 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     alt=""
-                    className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+                    className={cn(
+                      "h-full w-full object-cover transition-all duration-500",
+                      compact ? "" : "grayscale group-hover:grayscale-0",
+                    )}
                     src={img}
                   />
                 </Link>
@@ -253,7 +254,7 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
                 </Link>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-container-high font-headline text-xs font-bold text-on-surface-variant">
-                    {authorInitial(authorName)}
+                    {userInitial(authorName)}
                   </div>
                   <span className="font-login-body text-sm font-bold text-on-surface">
                     {authorName}
@@ -281,7 +282,7 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
       {!compact ? (
         <div ref={sentinelRef} className="h-4 w-full" aria-hidden />
       ) : null}
-      {!compact && loadingMore ? (
+      {!compact && isFetchingNextPage ? (
         <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
           <EditorialFeedCardSkeleton />
           <EditorialFeedCardSkeleton />

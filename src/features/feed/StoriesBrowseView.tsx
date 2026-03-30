@@ -1,13 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { HomeFeed } from "@/features/feed/HomeFeed";
 import { cn } from "@/lib/cn";
+import {
+  listPublishedStories,
+  listTrendingStories,
+} from "@/services/stories.service";
+import type { PaginatedStories } from "@/types";
+
+const FEED_PAGE = 10;
+
+function feedNextPageParam(lastPage: PaginatedStories) {
+  const page = lastPage.page ?? 1;
+  const pageSize = lastPage.pageSize ?? FEED_PAGE;
+  const totalPages =
+    lastPage.totalPages ?? Math.max(1, Math.ceil(lastPage.total / pageSize));
+  return page < totalPages ? page + 1 : undefined;
+}
 
 export function StoriesBrowseView() {
   const [sort, setSort] = useState<"latest" | "likes">("latest");
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const other = sort === "latest" ? "likes" : "latest";
+    void queryClient.prefetchInfiniteQuery({
+      queryKey: ["stories", "feed", other],
+      initialPageParam: 1,
+      queryFn: async ({ pageParam }) => {
+        const page = pageParam as number;
+        if (other === "likes") {
+          return listTrendingStories({ page, pageSize: FEED_PAGE });
+        }
+        return listPublishedStories({ page, pageSize: FEED_PAGE });
+      },
+      getNextPageParam: feedNextPageParam,
+    });
+  }, [sort, queryClient]);
 
   return (
     <div className="flex flex-1 flex-col bg-editorial-surface">
@@ -62,7 +95,7 @@ export function StoriesBrowseView() {
           </div>
         </div>
 
-        <HomeFeed key={sort} sort={sort} />
+        <HomeFeed sort={sort} />
       </div>
     </div>
   );
