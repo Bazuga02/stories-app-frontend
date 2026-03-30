@@ -31,9 +31,6 @@ const schema = z
 
 type Form = z.infer<typeof schema>;
 
-const portraitSrc =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuAnZ9ofwMsSOQSbDZJ9i7J0SZ2EobXoy6nfUXqH0f32SFOJgsiipJihTq7VJvs26EyuvckuqW9umx4LWcHKt7hB6q0uXgwNJ0Gj_LLTgfAk-nvBWwbKGwauw9C1nVC0rlP_qi1R3zRSfYs1iPtOPbXh6M6acbWla5toDEt41p0WG3CaozpTTI_u9Pc6yzykdsFw6a_rf5FAku2YNzMim1s6A_DazNUuhyKRiqCmyc1gLRNhSBVSLMhXChnoTwxRt2EWmcmKzRHGUA8";
-
 export function RegisterPageClient() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const showPrivacy = useLegalModalStore((s) => s.showPrivacy);
@@ -86,18 +83,10 @@ export function RegisterPageClient() {
             </div>
             <div className="relative z-10 rounded-editorial border border-on-primary-container/10 bg-surface-container-lowest/10 p-4 backdrop-blur-md sm:p-5 lg:rounded-editorial-lg lg:p-6">
               <div className="mb-3 flex items-center gap-3">
-                <div className="size-10 shrink-0 overflow-hidden rounded-full bg-tertiary-fixed-dim sm:size-11">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={portraitSrc}
-                    alt=""
-                    className="size-full object-cover"
-                  />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-on-primary-container/20 bg-on-primary-container/12 text-[0.6rem] font-bold tabular-nums text-on-primary-container sm:size-11 sm:text-[0.65rem]">
+                  AR
                 </div>
-                <div>
-                  <p className="text-sm leading-none font-bold sm:text-base">Elena Rossi</p>
-                  <p className="text-[10px] opacity-70 sm:text-xs">Editor-in-Chief</p>
-                </div>
+                <p className="text-sm leading-none font-bold sm:text-base">Abhishek Rai</p>
               </div>
               <p className="text-sm font-medium leading-relaxed italic sm:text-base">
                 &ldquo;Stories gave me the canvas I didn&apos;t know I was missing. It&apos;s not just a platform;
