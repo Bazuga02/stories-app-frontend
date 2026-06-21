@@ -11,6 +11,7 @@ import { register as registerApi } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/services/api";
 import { Footer } from "@/components/ui/footer";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { useLegalModalStore } from "@/store/legalModalStore";
 
 const schema = z
@@ -73,6 +74,10 @@ export function RegisterPageClient() {
             <div className="hand-drawn-star absolute top-6 right-6 size-16 bg-tertiary-fixed-dim opacity-30 lg:top-8 lg:right-8 lg:size-20" />
             <div className="absolute -bottom-8 -left-8 size-48 rounded-full bg-surface-container-lowest opacity-10 lg:-bottom-10 lg:-left-10 lg:size-56" />
             <div className="relative z-10">
+              <BrandLogo
+                className="mb-5"
+                textClassName="font-headline text-xl font-black tracking-tighter text-on-primary-container sm:text-2xl"
+              />
               <span className="mb-3 inline-block rounded-full bg-on-primary-container px-3 py-0.5 text-[10px] font-bold tracking-widest text-primary-container uppercase sm:px-4 sm:py-1 sm:text-xs lg:mb-4">
                 The Creator Suite
               </span>
@@ -111,6 +116,10 @@ export function RegisterPageClient() {
 
           {/* Side B */}
           <div className="mx-auto flex w-full max-w-[380px] flex-col justify-center bg-surface-container-low p-5 sm:max-w-md md:p-8 lg:mx-0 lg:max-w-none lg:p-10">
+            <BrandLogo
+              className="mb-4 self-center lg:hidden"
+              textClassName="font-headline text-xl font-black tracking-tighter text-primary"
+            />
             <Link
               href="/"
               className="font-login-label mb-4 inline-flex items-center gap-1.5 self-center text-sm font-bold text-primary transition-colors hover:underline lg:self-start"

@@ -13,6 +13,7 @@ import { login } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/services/api";
 import { Footer } from "@/components/ui/footer";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import loginAnimation from "../../../public/login-anim.json";
 
 const schema = z.object({
@@ -81,18 +82,19 @@ export function LoginPageClient() {
             </div>
           </div>
           <div className="absolute bottom-6 left-6 md:bottom-7 md:left-7">
-            <Link
-              href="/"
-              className="font-headline text-3xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container"
-            >
-              Stories
-            </Link>
+            <BrandLogo
+              textClassName="font-headline text-2xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container sm:text-3xl"
+            />
           </div>
         </section>
 
         {/* Right: form */}
         <section className="relative flex w-full shrink-0 flex-col items-center justify-start bg-editorial-surface px-5 pb-10 pt-5 md:min-h-0 md:w-1/2 md:justify-center md:px-10 md:pb-12 md:pt-12 lg:w-[45%] lg:px-12">
           <div className="w-full max-w-[340px] space-y-4 pb-6 sm:max-w-md sm:space-y-6 md:space-y-6 md:pb-0">
+            <BrandLogo
+              className="mb-4 md:hidden"
+              textClassName="font-headline text-xl font-black tracking-tighter text-primary"
+            />
             <Link
               href="/"
               className="font-login-label inline-flex items-center gap-1.5 text-sm font-bold text-primary transition-colors hover:underline"

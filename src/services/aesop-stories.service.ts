@@ -17,7 +17,7 @@ export function isAesopMongoId(id: string) {
 }
 
 export async function fetchAesopStories(): Promise<AesopStory[]> {
-  const res = await fetch("/api/aesop/stories", { cache: "no-store" });
+  const res = await fetch("/api/aesop/stories");
   if (!res.ok) {
     throw new Error(`Fables request failed (${res.status})`);
   }

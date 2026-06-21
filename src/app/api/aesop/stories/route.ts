@@ -17,5 +17,9 @@ export async function GET() {
     );
   }
   const data: unknown = await res.json();
-  return NextResponse.json(data);
+  return NextResponse.json(data, {
+    headers: {
+      "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+    },
+  });
 }

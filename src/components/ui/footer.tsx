@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLegalModalStore } from "@/store/legalModalStore";
+import { BrandLogo } from "@/components/ui/brand-logo";
 import { cn } from "@/lib/cn";
 
 const PORTFOLIO_URL = "https://abhishek02-portfolio.vercel.app/";
@@ -26,7 +27,9 @@ export function Footer({ className }: FooterProps) {
       )}
     >
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row md:gap-6">
-        <div className="font-headline text-xl font-black text-[#fafaeb] sm:text-2xl md:mb-0">Stories.</div>
+        <BrandLogo
+          textClassName="font-headline text-xl font-black text-[#fafaeb] sm:text-2xl"
+        />
         <nav
           className="flex flex-wrap justify-center gap-6 sm:gap-8"
           aria-label="Footer links"

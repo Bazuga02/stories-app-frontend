@@ -1,45 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 import { ArrowRight, BookOpen, Mic, Sparkles, Star } from "lucide-react";
 import {
   aesopExcerpt,
   aesopReadMinutes,
   aesopStoryId,
-  fetchAesopStories,
-  type AesopStory,
 } from "@/services/aesop-stories.service";
+import { useAesopStories } from "@/hooks/useAesopStories";
 import heroAnimation from "../../../public/hero-anim.json";
 
 export function EditorialHome() {
-  const [stories, setStories] = useState<AesopStory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const data = await fetchAesopStories();
-        if (!cancelled) {
-          setStories(data);
-          setError(null);
-        }
-      } catch {
-        if (!cancelled) {
-          setStories([]);
-          setError("Could not load short stories.");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: stories = [], isLoading: loading, isError } = useAesopStories();
+  const error = isError ? "Could not load short stories." : null;
 
   const preview = stories.slice(0, 5);
   const first = preview[0];

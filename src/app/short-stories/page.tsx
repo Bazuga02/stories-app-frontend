@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -14,9 +14,8 @@ import {
   aesopExcerpt,
   aesopReadMinutes,
   aesopStoryId,
-  fetchAesopStories,
-  type AesopStory,
 } from "@/services/aesop-stories.service";
+import { useAesopStories } from "@/hooks/useAesopStories";
 import { PageLoader } from "@/components/ui/loader";
 import { cn } from "@/lib/cn";
 
@@ -31,33 +30,9 @@ function moralOneLiner(moral?: string) {
 }
 
 export default function ShortStoriesPage() {
-  const [stories, setStories] = useState<AesopStory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: stories = [], isLoading: loading, isError } = useAesopStories();
+  const error = isError ? "Could not load stories." : null;
   const [listPage, setListPage] = useState(1);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const data = await fetchAesopStories();
-        if (!cancelled) {
-          setStories(data);
-          setError(null);
-        }
-      } catch {
-        if (!cancelled) {
-          setStories([]);
-          setError("Could not load stories.");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const featured = stories[0];
   const secondary = stories[1];

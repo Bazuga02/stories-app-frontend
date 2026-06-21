@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -17,11 +17,10 @@ import { useBookmarkStore } from "@/store/bookmarkStore";
 import { bookmarkStory, unbookmarkStory } from "@/services/bookmarks.service";
 import {
   aesopStoryId,
-  fetchAesopStoryById,
-  fetchAesopStories,
   isAesopMongoId,
   type AesopStory,
 } from "@/services/aesop-stories.service";
+import { findAesopStoryById, useAesopStories } from "@/hooks/useAesopStories";
 import { AesopStoryView } from "@/features/story/AesopStoryView";
 import { PublishedStoryView } from "@/features/story/PublishedStoryView";
 import { StoryNotFound } from "@/features/story/StoryNotFound";
@@ -31,50 +30,54 @@ export default function StoryPage() {
   const params = useParams();
   const id = String(params.id ?? "");
   const user = useAuthStore((s) => s.user);
+  const { data: aesopStories = [], isLoading: aesopLoading, isFetched: aesopFetched } =
+    useAesopStories();
   const [story, setStory] = useState<(Story & { comments?: Comment[] }) | null>(null);
   const [aesopStory, setAesopStory] = useState<AesopStory | null>(null);
-  const [relatedAesop, setRelatedAesop] = useState<AesopStory[]>([]);
   const [related, setRelated] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [publishedLoading, setPublishedLoading] = useState(true);
   const toggleBookmarkLocal = useBookmarkStore((s) => s.toggle);
   const bookmarkIds = useBookmarkStore((s) => s.ids);
 
   const narration = useStoryNarration(story, user);
 
-  const load = useCallback(async () => {
+  const relatedAesop = useMemo(() => {
+    if (!aesopStory) return [];
+    const oid = aesopStoryId(aesopStory);
+    return aesopStories.filter((s) => aesopStoryId(s) !== oid).slice(0, 2);
+  }, [aesopStory, aesopStories]);
+
+  const loadPublished = useCallback(async () => {
     if (!id) return;
-    setLoading(true);
+    setPublishedLoading(true);
     try {
-      if (isAesopMongoId(id)) {
-        const fable = await fetchAesopStoryById(id);
-        setAesopStory(fable);
-        setStory(null);
-        return;
-      }
-      try {
-        const data = await getStory(id);
-        setStory(data);
-        setAesopStory(null);
-      } catch {
-        const fable = await fetchAesopStoryById(id);
-        setAesopStory(fable);
-        setStory(null);
-        if (!fable) {
-          toast.error("Story not found");
-        }
-      }
-    } catch (e) {
-      toast.error(getApiErrorMessage(e, "Story not found"));
-      setStory(null);
+      const data = await getStory(id);
+      setStory(data);
       setAesopStory(null);
+    } catch {
+      const fable = findAesopStoryById(aesopStories, id);
+      setAesopStory(fable);
+      setStory(null);
+      if (!fable) {
+        toast.error("Story not found");
+      }
     } finally {
-      setLoading(false);
+      setPublishedLoading(false);
     }
-  }, [id]);
+  }, [id, aesopStories]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!id) return;
+
+    if (isAesopMongoId(id)) {
+      setStory(null);
+      setPublishedLoading(false);
+      setAesopStory(findAesopStoryById(aesopStories, id));
+      return;
+    }
+
+    void loadPublished();
+  }, [id, aesopStories, loadPublished]);
 
   useEffect(() => {
     if (!id || isAesopMongoId(id)) return;
@@ -92,27 +95,6 @@ export default function StoryPage() {
       cancelled = true;
     };
   }, [id]);
-
-  useEffect(() => {
-    if (!aesopStory) {
-      setRelatedAesop([]);
-      return;
-    }
-    let cancelled = false;
-    void (async () => {
-      try {
-        const all = await fetchAesopStories();
-        const oid = aesopStoryId(aesopStory);
-        const next = all.filter((s) => aesopStoryId(s) !== oid).slice(0, 2);
-        if (!cancelled) setRelatedAesop(next);
-      } catch {
-        if (!cancelled) setRelatedAesop([]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [aesopStory]);
 
   const onLike = async () => {
     if (!user) {
@@ -162,6 +144,11 @@ export default function StoryPage() {
     }
   };
 
+  const loading =
+    isAesopMongoId(id)
+      ? aesopLoading && !aesopFetched
+      : publishedLoading || (aesopLoading && !aesopFetched && !story && !aesopStory);
+
   if (loading) {
     return <PageLoader />;
   }
@@ -187,7 +174,7 @@ export default function StoryPage() {
       related={related}
       user={user}
       bookmarked={bookmarked}
-      onReload={load}
+      onReload={loadPublished}
       onLike={onLike}
       onBookmark={onBookmark}
       onShare={onShare}
