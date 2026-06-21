@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { LogOut, Menu, PenLine, X } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { cn } from "@/lib/cn";
+import { logout } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 
 function initials(name: string) {
@@ -16,8 +17,9 @@ function initials(name: string) {
 }
 
 function signOut() {
-  useAuthStore.getState().clearAuth();
-  window.location.href = "/";
+  void logout().finally(() => {
+    window.location.href = "/";
+  });
 }
 
 function NavTextLink({

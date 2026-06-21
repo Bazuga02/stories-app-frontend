@@ -38,7 +38,7 @@ export function LoginPageClient() {
   const onSubmit = async (data: Form) => {
     try {
       const res = await login(data);
-      setAuth(res.user, res.token);
+      setAuth(res.user, res.accessToken);
       toast.success("Welcome back!");
       window.location.assign(next);
     } catch (e) {

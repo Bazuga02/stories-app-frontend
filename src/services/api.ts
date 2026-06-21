@@ -3,6 +3,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import type { ApiErrorBody } from "@/types";
+import { getAccessToken, useAuthStore } from "@/store/authStore";
 
 /**
  * If `NEXT_PUBLIC_API_URL` is unset, the browser uses same-origin `/api/*`
@@ -21,52 +22,100 @@ function resolveApiBaseURL(): string {
 
 const baseURL = resolveApiBaseURL();
 
-export const TOKEN_STORAGE_KEY = "stories_jwt";
-
-export function getStoredToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_STORAGE_KEY);
-}
-
-export function setStoredToken(token: string | null) {
-  if (typeof window === "undefined") return;
-  if (token) localStorage.setItem(TOKEN_STORAGE_KEY, token);
-  else localStorage.removeItem(TOKEN_STORAGE_KEY);
-}
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 export const api = axios.create({
   baseURL,
   headers: { "Content-Type": "application/json" },
   timeout: 30_000,
+  withCredentials: true,
+});
+
+/** Separate client for refresh to avoid interceptor loops. */
+export const refreshClient = axios.create({
+  baseURL,
+  headers: { "Content-Type": "application/json" },
+  timeout: 30_000,
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = getStoredToken();
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-let handling401 = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const { data } = await refreshClient.post<{ accessToken: string }>(
+      "/auth/refresh",
+    );
+    useAuthStore.getState().setAccessToken(data.accessToken);
+    return data.accessToken;
+  } catch {
+    return null;
+  }
+}
+
+function shouldSkipRefreshRetry(url: string | undefined) {
+  if (!url) return false;
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/register") ||
+    url.includes("/auth/refresh") ||
+    url.includes("/auth/logout")
+  );
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname;
+  if (path.startsWith("/login") || path.startsWith("/register")) return;
+  window.dispatchEvent(new CustomEvent("stories:auth:logout"));
+  window.location.assign(`/login?next=${encodeURIComponent(path)}`);
+}
 
 api.interceptors.response.use(
   (res) => res,
-  (error: AxiosError<ApiErrorBody>) => {
+  async (error: AxiosError<ApiErrorBody>) => {
     const status = error.response?.status;
-    if (status === 401 && typeof window !== "undefined") {
-      const path = window.location.pathname;
-      const isAuthPage =
-        path.startsWith("/login") || path.startsWith("/register");
-      if (!isAuthPage && !handling401) {
-        handling401 = true;
-        setStoredToken(null);
-        window.dispatchEvent(new CustomEvent("stories:auth:logout"));
-        window.location.assign(`/login?next=${encodeURIComponent(path)}`);
-        handling401 = false;
-      }
+    const original = error.config as RetryConfig | undefined;
+
+    if (status !== 401 || !original || typeof window === "undefined") {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    if (shouldSkipRefreshRetry(original.url)) {
+      return Promise.reject(error);
+    }
+
+    if (original._retry) {
+      useAuthStore.getState().clearAuth();
+      redirectToLogin();
+      return Promise.reject(error);
+    }
+
+    original._retry = true;
+
+    if (!refreshPromise) {
+      refreshPromise = refreshAccessToken().finally(() => {
+        refreshPromise = null;
+      });
+    }
+
+    const newToken = await refreshPromise;
+    if (!newToken) {
+      useAuthStore.getState().clearAuth();
+      redirectToLogin();
+      return Promise.reject(error);
+    }
+
+    original.headers.Authorization = `Bearer ${newToken}`;
+    return api(original);
   },
 );
 

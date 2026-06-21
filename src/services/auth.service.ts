@@ -1,6 +1,6 @@
-import axios from "axios";
-import { api } from "./api";
-import type { AuthResponse, User } from "@/types";
+import { api, refreshClient } from "./api";
+import { useAuthStore } from "@/store/authStore";
+import type { AuthResponse, TokenRefreshResponse, User } from "@/types";
 
 export async function login(payload: { email: string; password: string }) {
   const { data } = await api.post<AuthResponse>("/auth/login", payload);
@@ -16,15 +16,21 @@ export async function register(payload: {
   return data;
 }
 
-export async function fetchMe() {
+export async function refreshSession() {
+  const { data } = await refreshClient.post<TokenRefreshResponse>("/auth/refresh");
+  useAuthStore.getState().setAccessToken(data.accessToken);
+  return data.accessToken;
+}
+
+export async function logout() {
   try {
-    const { data } = await api.get<User>("/auth/me");
-    return data;
-  } catch (e) {
-    if (axios.isAxiosError(e) && e.response?.status === 404) {
-      const { data } = await api.get<User>("/users/me");
-      return data;
-    }
-    throw e;
+    await api.post("/auth/logout");
+  } finally {
+    useAuthStore.getState().clearAuth();
   }
+}
+
+export async function fetchMe() {
+  const { data } = await api.get<User>("/auth/me");
+  return data;
 }
