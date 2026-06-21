@@ -52,7 +52,7 @@ export function RegisterPageClient() {
         password: data.password,
         name: data.name,
       });
-      setAuth(res.user, res.token);
+      setAuth(res.user, res.accessToken);
       toast.success("Account created!");
       window.location.assign("/dashboard");
     } catch (e) {

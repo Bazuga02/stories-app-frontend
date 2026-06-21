@@ -75,8 +75,12 @@ export interface AdminCommentRow {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   user: User;
+}
+
+export interface TokenRefreshResponse {
+  accessToken: string;
 }
 
 export interface ApiErrorBody {

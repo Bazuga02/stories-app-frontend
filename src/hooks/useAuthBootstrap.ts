@@ -1,47 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchMe } from "@/services/auth.service";
+import { fetchMe, refreshSession } from "@/services/auth.service";
 import { listBookmarkedStories } from "@/services/bookmarks.service";
-import { getStoredToken } from "@/services/api";
-import { useAuthStore } from "@/store/authStore";
+import {
+  clearLegacyTokenStorage,
+  useAuthStore,
+} from "@/store/authStore";
 import { useBookmarkStore } from "@/store/bookmarkStore";
 
 export function useAuthBootstrap() {
   const [ready, setReady] = useState(false);
-  const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const clearAuth = useAuthStore((s) => s.clearAuth);
 
   useEffect(() => {
-    if (!getStoredToken() && user) {
-      queueMicrotask(() => setUser(null));
-    }
-  }, [user, setUser]);
-
-  useEffect(() => {
     let cancelled = false;
-    const token = getStoredToken();
-    if (!token) {
-      queueMicrotask(() => {
-        if (!cancelled) setReady(true);
-      });
-      return () => {
-        cancelled = true;
-      };
-    }
-    fetchMe()
+
+    clearLegacyTokenStorage();
+
+    refreshSession()
+      .then(() => fetchMe())
       .then((u) => {
-        if (!cancelled) setUser(u);
-        if (!cancelled) {
-          listBookmarkedStories()
-            .then((stories) => {
-              useBookmarkStore.getState().syncFromServer(stories.map((s) => s.id));
-            })
-            .catch(() => {
-              /* bookmarks optional */
-            });
-        }
+        if (cancelled) return;
+        setUser(u);
+        return listBookmarkedStories()
+          .then((stories) => {
+            useBookmarkStore.getState().syncFromServer(stories.map((s) => s.id));
+          })
+          .catch(() => {
+            /* bookmarks optional */
+          });
       })
       .catch(() => {
         if (!cancelled) {
@@ -52,10 +42,11 @@ export function useAuthBootstrap() {
       .finally(() => {
         if (!cancelled) setReady(true);
       });
+
     return () => {
       cancelled = true;
     };
-  }, [setUser, clearAuth]);
+  }, [setUser, setAccessToken, clearAuth]);
 
   useEffect(() => {
     const onLogout = () => {
