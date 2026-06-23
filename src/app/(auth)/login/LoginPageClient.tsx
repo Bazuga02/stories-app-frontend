@@ -12,9 +12,8 @@ import { Eye, EyeOff, Quote, Sparkles, Star } from "lucide-react";
 import { login } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/services/api";
-import { Footer } from "@/components/ui/footer";
 import { BrandLogo } from "@/components/ui/brand-logo";
-import loginAnimation from "../../../public/login-anim.json";
+import loginAnimation from "../../../../public/login-anim.json";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -48,25 +47,25 @@ export function LoginPageClient() {
 
   return (
     <div className="flex w-full flex-col md:min-h-0 md:flex-1">
-      <main className="flex w-full flex-col text-on-surface md:min-h-0 md:flex-1 md:flex-row md:overflow-hidden">
+      <main className="flex w-full grow flex-col text-on-surface md:min-h-0 md:flex-row md:items-stretch">
         {/* Left: illustration */}
-        <section className="relative hidden w-full flex-col items-center justify-center overflow-hidden bg-surface-container-low p-6 md:flex md:w-1/2 md:p-7 lg:w-[55%]">
-          <div className="absolute top-12 left-12 text-primary opacity-20 md:top-14 md:left-14">
+        <section className="relative hidden w-full flex-col bg-surface-container-low p-6 md:flex md:min-h-0 md:min-w-0 md:w-1/2 md:p-7 lg:w-[55%]">
+          <div className="pointer-events-none absolute top-12 left-12 text-primary opacity-20 md:top-14 md:left-14">
             <Star aria-hidden className="size-11 md:size-12" strokeWidth={1.25} />
           </div>
-          <div className="absolute right-7 bottom-28 rotate-12 text-tertiary-container opacity-20 md:bottom-26">
+          <div className="pointer-events-none absolute right-7 top-1/2 rotate-12 text-tertiary-container opacity-20">
             <Sparkles aria-hidden className="size-13 md:size-17" strokeWidth={1.25} />
           </div>
-          <div className="relative z-10 w-full max-w-lg lg:max-w-xl">
-            <div className="editorial-cloud -rotate-2 transform bg-surface-container-lowest p-2 shadow-2xl">
+          <div className="relative z-10 mx-auto flex w-full min-h-0 max-w-lg flex-1 flex-col justify-center gap-5 lg:max-w-xl">
+            <div className="editorial-cloud w-full -rotate-2 transform bg-surface-container-lowest p-2 shadow-2xl">
               <Lottie
                 animationData={loginAnimation}
                 loop
-                className="h-[min(40vh,380px)] w-full md:h-[380px] lg:h-[440px] [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain"
+                className="h-auto w-full max-h-[min(36dvh,20rem)] lg:max-h-[min(40dvh,24rem)] [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain"
                 aria-label="Animated illustration for Stories sign-in"
               />
             </div>
-            <div className="absolute -right-3 -bottom-2 max-w-[190px] -translate-y-2 rotate-3 rounded-editorial border border-outline-variant/10 bg-surface-container-lowest p-3 shadow-lg sm:max-w-[220px] sm:p-4 sm:-translate-y-3">
+            <div className="ml-auto max-w-[190px] rotate-3 rounded-editorial border border-outline-variant/10 bg-surface-container-lowest p-3 shadow-lg sm:max-w-[220px] sm:p-4">
               <Quote aria-hidden className="mb-1 size-5 text-primary" strokeWidth={2} />
               <p className="font-headline text-sm leading-snug text-on-surface sm:text-base">
                 Every word is a <span className="text-primary">new world</span> waiting to be built.
@@ -81,7 +80,7 @@ export function LoginPageClient() {
               </div>
             </div>
           </div>
-          <div className="absolute bottom-6 left-6 md:bottom-7 md:left-7">
+          <div className="relative z-10 mt-5 shrink-0 md:mt-6">
             <BrandLogo
               textClassName="font-headline text-2xl font-black tracking-tighter text-primary transition-colors hover:text-primary-container sm:text-3xl"
             />
@@ -89,7 +88,7 @@ export function LoginPageClient() {
         </section>
 
         {/* Right: form */}
-        <section className="relative flex w-full shrink-0 flex-col items-center justify-start bg-editorial-surface px-5 pb-10 pt-5 md:min-h-0 md:w-1/2 md:justify-center md:px-10 md:pb-12 md:pt-12 lg:w-[45%] lg:px-12">
+        <section className="relative flex w-full flex-col items-center justify-start bg-editorial-surface px-5 pb-10 pt-5 md:min-h-0 md:min-w-0 md:w-1/2 md:justify-center md:px-10 md:pb-12 md:pt-12 lg:w-[45%] lg:px-12">
           <div className="w-full max-w-[340px] space-y-4 pb-6 sm:max-w-md sm:space-y-6 md:space-y-6 md:pb-0">
             <BrandLogo
               className="mb-4 md:hidden"
@@ -228,8 +227,6 @@ export function LoginPageClient() {
         <div className="absolute -top-20 -left-20 size-72 rounded-full bg-tertiary-fixed-dim/20 blur-[80px] sm:size-80" />
         <div className="absolute top-1/2 -right-36 size-72 rounded-full bg-primary-fixed-dim/10 blur-[100px] sm:-right-40 sm:size-80" />
       </div>
-
-      <Footer className="relative z-10 mt-auto w-full shrink-0 py-6 sm:py-8 md:py-12" />
     </div>
   );
 }

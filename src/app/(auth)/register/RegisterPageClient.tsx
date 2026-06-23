@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { register as registerApi } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { getApiErrorMessage } from "@/services/api";
-import { Footer } from "@/components/ui/footer";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { useLegalModalStore } from "@/store/legalModalStore";
 
@@ -61,44 +60,44 @@ export function RegisterPageClient() {
   };
 
   const inputClass =
-    "w-full rounded-full border-none bg-surface-container-highest px-5 py-3 text-sm font-medium text-on-background placeholder:text-on-surface-variant/50 transition-all focus:ring-2 focus:ring-primary/40 focus:outline-none sm:px-6 sm:text-base";
+    "w-full rounded-full border-none bg-surface-container-highest px-4 py-2.5 text-sm font-medium text-on-background placeholder:text-on-surface-variant/50 transition-all focus:ring-2 focus:ring-primary/40 focus:outline-none sm:px-5";
 
-  const passwordInputClass = `${inputClass} pr-12 sm:pr-14`;
+  const passwordInputClass = `${inputClass} pr-11 sm:pr-12`;
 
   return (
     <div className="flex w-full flex-col md:min-h-0 md:flex-1">
-      <main className="flex grow items-center justify-center px-3 py-6 sm:px-4 md:py-10">
-        <div className="editorial-shadow grid w-full max-w-5xl grid-cols-1 gap-0 overflow-hidden rounded-editorial-lg bg-surface-container-low lg:max-w-6xl lg:grid-cols-2 lg:rounded-editorial-xl">
+      <main className="flex grow items-center justify-center px-3 py-4 sm:px-4 md:py-6">
+        <div className="editorial-shadow grid w-full max-w-4xl grid-cols-1 gap-0 overflow-hidden rounded-editorial-lg bg-surface-container-low lg:max-w-5xl lg:grid-cols-2 lg:rounded-editorial-xl">
           {/* Side A */}
-          <div className="relative hidden flex-col justify-between overflow-hidden bg-primary-container p-8 text-on-primary-container lg:flex lg:p-10">
-            <div className="hand-drawn-star absolute top-6 right-6 size-16 bg-tertiary-fixed-dim opacity-30 lg:top-8 lg:right-8 lg:size-20" />
-            <div className="absolute -bottom-8 -left-8 size-48 rounded-full bg-surface-container-lowest opacity-10 lg:-bottom-10 lg:-left-10 lg:size-56" />
+          <div className="relative hidden flex-col justify-between overflow-hidden bg-primary-container p-6 text-on-primary-container lg:flex lg:p-8">
+            <div className="hand-drawn-star absolute top-5 right-5 size-14 bg-tertiary-fixed-dim opacity-30 lg:top-6 lg:right-6 lg:size-16" />
+            <div className="absolute -bottom-8 -left-8 size-40 rounded-full bg-surface-container-lowest opacity-10 lg:-bottom-10 lg:-left-10 lg:size-48" />
             <div className="relative z-10">
               <BrandLogo
-                className="mb-5"
-                textClassName="font-headline text-xl font-black tracking-tighter text-on-primary-container sm:text-2xl"
+                className="mb-3"
+                textClassName="font-headline text-lg font-black tracking-tighter text-on-primary-container sm:text-xl"
               />
-              <span className="mb-3 inline-block rounded-full bg-on-primary-container px-3 py-0.5 text-[10px] font-bold tracking-widest text-primary-container uppercase sm:px-4 sm:py-1 sm:text-xs lg:mb-4">
+              <span className="mb-2 inline-block rounded-full bg-on-primary-container px-3 py-0.5 text-[10px] font-bold tracking-widest text-primary-container uppercase">
                 The Creator Suite
               </span>
-              <h1 className="font-headline text-3xl leading-[0.92] font-black tracking-tighter md:text-4xl lg:text-5xl">
+              <h1 className="font-headline text-2xl leading-[0.95] font-black tracking-tighter md:text-3xl lg:text-4xl">
                 Every <span className="text-tertiary-fixed">great</span> legacy begins with a single{" "}
-                <span className="italic underline decoration-tertiary-fixed/40 decoration-4 sm:decoration-8">word</span>.
+                <span className="italic underline decoration-tertiary-fixed/40 decoration-4">word</span>.
               </h1>
             </div>
-            <div className="relative z-10 rounded-editorial border border-on-primary-container/10 bg-surface-container-lowest/10 p-4 backdrop-blur-md sm:p-5 lg:rounded-editorial-lg lg:p-6">
-              <div className="mb-3 flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-on-primary-container/20 bg-on-primary-container/12 text-[0.6rem] font-bold tabular-nums text-on-primary-container sm:size-11 sm:text-[0.65rem]">
+            <div className="relative z-10 rounded-editorial border border-on-primary-container/10 bg-surface-container-lowest/10 p-3.5 backdrop-blur-md sm:p-4 lg:rounded-editorial-lg">
+              <div className="mb-2 flex items-center gap-2.5">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-on-primary-container/20 bg-on-primary-container/12 text-[0.55rem] font-bold tabular-nums text-on-primary-container">
                   AR
                 </div>
-                <p className="text-sm leading-none font-bold sm:text-base">Abhishek Rai</p>
+                <p className="text-sm leading-none font-bold">Abhishek Rai</p>
               </div>
-              <p className="text-sm font-medium leading-relaxed italic sm:text-base">
+              <p className="text-sm font-medium leading-snug italic">
                 &ldquo;Stories gave me the canvas I didn&apos;t know I was missing. It&apos;s not just a platform;
                 it&apos;s a heartbeat for digital journalism.&rdquo;
               </p>
             </div>
-            <div className="pointer-events-none absolute right-0 bottom-14 w-56 translate-x-1/3 opacity-20 sm:bottom-16 sm:w-64 lg:bottom-20 lg:w-72">
+            <div className="pointer-events-none absolute right-0 bottom-10 w-48 translate-x-1/3 opacity-20 sm:bottom-12 sm:w-56 lg:bottom-14 lg:w-64">
               <svg
                 className="h-auto w-full"
                 viewBox="0 0 400 400"
@@ -115,28 +114,28 @@ export function RegisterPageClient() {
           </div>
 
           {/* Side B */}
-          <div className="mx-auto flex w-full max-w-[380px] flex-col justify-center bg-surface-container-low p-5 sm:max-w-md md:p-8 lg:mx-0 lg:max-w-none lg:p-10">
+          <div className="mx-auto flex w-full max-w-[360px] flex-col justify-center bg-surface-container-low p-4 sm:max-w-md sm:p-5 lg:mx-0 lg:max-w-none lg:p-7">
             <BrandLogo
-              className="mb-4 self-center lg:hidden"
-              textClassName="font-headline text-xl font-black tracking-tighter text-primary"
+              className="mb-2 self-center lg:hidden"
+              textClassName="font-headline text-lg font-black tracking-tighter text-primary"
             />
             <Link
               href="/"
-              className="font-login-label mb-4 inline-flex items-center gap-1.5 self-center text-sm font-bold text-primary transition-colors hover:underline lg:self-start"
+              className="font-login-label mb-3 inline-flex items-center gap-1.5 self-center text-sm font-bold text-primary transition-colors hover:underline lg:mb-2 lg:self-start"
             >
               <span aria-hidden>←</span>
               Back to home
             </Link>
-            <div className="mb-5 text-center lg:mb-6 lg:text-left">
-              <h2 className="font-headline mb-1 text-2xl font-black tracking-tighter text-on-background sm:text-3xl md:text-4xl">
+            <div className="mb-4 text-center lg:mb-4 lg:text-left">
+              <h2 className="font-headline mb-0.5 text-xl font-black tracking-tighter text-on-background sm:text-2xl md:text-3xl">
                 Join the narrative.
               </h2>
-              <p className="text-sm font-medium text-on-surface-variant sm:text-base">
+              <p className="text-sm font-medium text-on-surface-variant">
                 Start your 14-day free trial today. No credit card required.
               </p>
             </div>
 
-            <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form className="space-y-2.5" onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className="space-y-1">
                 <label
                   htmlFor="reg-name"
@@ -253,19 +252,19 @@ export function RegisterPageClient() {
                   </p>
                 )}
               </div>
-              <div className="pt-1 sm:pt-2">
+              <div className="pt-0.5">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="font-headline w-full rounded-full bg-primary py-3.5 text-base font-black tracking-tight text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:bg-primary-container active:scale-95 disabled:opacity-70 sm:py-4"
+                  className="font-headline w-full rounded-full bg-primary py-3 text-sm font-black tracking-tight text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:bg-primary-container active:scale-95 disabled:opacity-70 sm:text-base"
                 >
                   {isSubmitting ? "Creating…" : "Create Account"}
                 </button>
               </div>
             </form>
 
-            <div className="mt-4 text-center sm:mt-5">
-              <p className="text-sm font-medium text-on-surface-variant sm:text-base">
+            <div className="mt-3 text-center">
+              <p className="text-sm font-medium text-on-surface-variant">
                 Already have an account?{" "}
                 <Link
                   href="/login"
@@ -275,7 +274,7 @@ export function RegisterPageClient() {
                 </Link>
               </p>
             </div>
-            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-on-surface-variant sm:mt-5 sm:text-sm">
+            <p className="mx-auto mt-3 max-w-md text-center text-xs leading-snug text-on-surface-variant">
               By clicking Create Account, you agree to our{" "}
               <button
                 type="button"
@@ -297,8 +296,6 @@ export function RegisterPageClient() {
           </div>
         </div>
       </main>
-
-      <Footer className="mt-auto shrink-0" />
     </div>
   );
 }

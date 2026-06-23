@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { AdminGuard } from "@/components/auth/AdminGuard";
-import { AdminViewportShell } from "@/components/auth/admin-viewport-shell";
 
 export const metadata: Metadata = {
   title: "Admin Panel — Stories",
@@ -13,7 +12,7 @@ export default function AdminLayout({
 }) {
   return (
     <AdminGuard>
-      <AdminViewportShell>{children}</AdminViewportShell>
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </AdminGuard>
   );
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { EditorViewportShell } from "@/components/auth/editor-viewport-shell";
 
 export const metadata: Metadata = {
   title: "Write — Stories",
@@ -13,10 +12,7 @@ export default function EditorLayout({
 }) {
   return (
     <AuthGuard>
-      <>
-        <div className="h-dvh shrink-0" aria-hidden />
-        <EditorViewportShell>{children}</EditorViewportShell>
-      </>
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </AuthGuard>
   );
 }

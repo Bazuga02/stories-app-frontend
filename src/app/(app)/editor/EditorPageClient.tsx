@@ -24,7 +24,6 @@ import {
   type RichMarkdownEditorHandle,
 } from "@/components/editor/RichMarkdownEditor";
 import { cn } from "@/lib/cn";
-import { Footer } from "@/components/ui/footer";
 import { randomPicsumCoverCandidates } from "@/lib/picsum";
 import {
   EDITOR_TIP_IMAGE,
@@ -504,8 +503,6 @@ export function EditorPageClient() {
               </div>
             </article>
           </div>
-
-          <Footer className="mt-16 shrink-0 pb-16 sm:pb-20" />
         </main>
 
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4 sm:bottom-8">

@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { B612, Epilogue, Plus_Jakarta_Sans, Source_Serif_4, Vina_Sans } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
-import { Navbar } from "@/components/ui/navbar";
-import { Footer } from "@/components/ui/footer";
 
 const vinaSans = Vina_Sans({
   weight: "400",
@@ -59,14 +57,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className="font-login-body flex min-h-full flex-col bg-editorial-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed"
+        className="font-login-body flex min-h-full flex-col selection:bg-primary-fixed selection:text-on-primary-fixed"
         suppressHydrationWarning
       >
-        <AppProviders>
-          <Navbar />
-          <div className="flex flex-1 flex-col">{children}</div>
-          <Footer />
-        </AppProviders>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

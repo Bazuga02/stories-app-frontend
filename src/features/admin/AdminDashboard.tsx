@@ -28,7 +28,6 @@ import { getApiErrorMessage } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import type { AdminCommentRow, AdminStats, AdminStoryRow, User } from "@/types";
 import { PageLoader } from "@/components/ui/loader";
-import { Footer } from "@/components/ui/footer";
 
 const EMAIL_NOTIF_KEY = "stories-admin-email-notifications";
 
@@ -514,8 +513,6 @@ export function AdminDashboard() {
             </div>
           )}
         </div>
-
-        <Footer className="mt-12" />
       </main>
     </div>
   );
