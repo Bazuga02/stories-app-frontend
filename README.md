@@ -2,6 +2,9 @@
 [![Backend Repository](https://img.shields.io/badge/Backend-GitHub-black?logo=github)](https://github.com/Bazuga02/stories-app-backend)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue?logo=vercel)](https://stories-app-frontend.vercel.app)
 
+- **Backend Repository:** https://github.com/Bazuga02/stories-app-backend
+- **Live Demo:** https://stories-app-frontend.vercel.app
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
