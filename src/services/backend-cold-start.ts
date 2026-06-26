@@ -5,7 +5,7 @@ export type ColdStartRetryConfig = InternalAxiosRequestConfig & {
   _coldStartRetryCount?: number;
 };
 
-const COLD_START_TOAST_ID = "backend-cold-start";
+const BACKEND_WARMUP_TOAST_ID = "backend-cold-start";
 const COLD_START_MAX_RETRIES = 4;
 const COLD_START_RETRY_DELAY_MS = 15_000;
 
@@ -29,17 +29,14 @@ function sleep(ms: number) {
 export function notifyBackendWakingUp() {
   if (typeof window === "undefined") return;
 
-  toast.info("Please wait — backend is starting up", {
-    id: COLD_START_TOAST_ID,
-    description:
-      "Our API runs on Render's free tier and can take 1–2 minutes to wake up after idle time. We're retrying automatically.",
-    duration: 120_000,
-  });
+  void import("@/components/ui/backend-warmup-toast").then((m) =>
+    m.showBackendWarmupToast(),
+  );
 }
 
 export function dismissBackendWakingUpToast() {
   if (typeof window === "undefined") return;
-  toast.dismiss(COLD_START_TOAST_ID);
+  toast.dismiss(BACKEND_WARMUP_TOAST_ID);
 }
 
 export function attachColdStartRetryInterceptor(client: AxiosInstance) {
