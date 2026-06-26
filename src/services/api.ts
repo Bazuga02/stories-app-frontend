@@ -4,6 +4,10 @@ import axios, {
 } from "axios";
 import type { ApiErrorBody } from "@/types";
 import { getAccessToken, useAuthStore } from "@/store/authStore";
+import {
+  attachColdStartRetryInterceptor,
+  isBackendWakingUpError,
+} from "./backend-cold-start";
 
 /**
  * If `NEXT_PUBLIC_API_URL` is unset, the browser uses same-origin `/api/*`
@@ -38,6 +42,9 @@ export const refreshClient = axios.create({
   timeout: 30_000,
   withCredentials: true,
 });
+
+attachColdStartRetryInterceptor(api);
+attachColdStartRetryInterceptor(refreshClient);
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getAccessToken();
@@ -121,6 +128,9 @@ api.interceptors.response.use(
 
 export function getApiErrorMessage(err: unknown, fallback = "Something went wrong") {
   if (axios.isAxiosError<ApiErrorBody>(err)) {
+    if (isBackendWakingUpError(err)) {
+      return "The server is still waking up. Please wait 1–2 minutes and try again.";
+    }
     const data = err.response?.data;
     const msg = data?.message;
     if (typeof msg === "string") return msg;

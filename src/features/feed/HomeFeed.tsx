@@ -19,6 +19,7 @@ import { getApiErrorMessage } from "@/services/api";
 import type { Story } from "@/types";
 import { excerptFromContent } from "@/utils/excerpt";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BackendWarmupNotice } from "@/components/ui/backend-warmup-notice";
 import { useAuthStore } from "@/store/authStore";
 import { useBookmarkStore } from "@/store/bookmarkStore";
 import {
@@ -151,11 +152,14 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
 
   if (isPending && !data) {
     return (
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <EditorialFeedCardSkeleton key={i} />
-        ))}
-      </div>
+      <>
+        <BackendWarmupNotice />
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <EditorialFeedCardSkeleton key={i} />
+          ))}
+        </div>
+      </>
     );
   }
 
@@ -164,10 +168,10 @@ export function HomeFeed({ compact = false, sort = "latest" }: HomeFeedProps) {
       return (
         <div className="rounded-xl bg-surface-container-low p-10 text-center editorial-shadow">
           <p className="font-headline text-lg font-bold text-on-surface">
-            Couldn&apos;t load stories
+            Couldn&apos;t load stories yet
           </p>
           <p className="mt-2 font-login-body text-sm text-on-secondary-container">
-            Check your connection and try again.
+            {getApiErrorMessage(error, "Could not load stories")}
           </p>
         </div>
       );
