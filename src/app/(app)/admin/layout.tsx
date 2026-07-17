@@ -10,9 +10,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AdminGuard>
-      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-    </AdminGuard>
-  );
+  return <AdminGuard>{children}</AdminGuard>;
 }

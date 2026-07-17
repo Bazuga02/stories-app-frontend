@@ -108,7 +108,7 @@ export const RichMarkdownEditor = forwardRef<RichMarkdownEditorHandle, Props>(
           contentEditable
           suppressContentEditableWarning
           className={cn(
-            "min-h-[min(400px,45vh)] w-full resize-y overflow-auto border-none bg-transparent text-xl leading-relaxed text-on-surface/90 outline-none focus:ring-0 empty:before:pointer-events-none empty:before:text-on-surface-variant/50 empty:before:content-[attr(data-placeholder)] md:text-2xl",
+            "min-h-[min(400px,45vh)] w-full border-none bg-transparent text-xl leading-relaxed text-on-surface/90 outline-none focus:ring-0 empty:before:pointer-events-none empty:before:text-on-surface-variant/50 empty:before:content-[attr(data-placeholder)] md:text-2xl",
             "[&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-8 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-8 [&_h2]:font-headline [&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:text-2xl [&_h2]:font-bold [&_blockquote]:my-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary/40 [&_blockquote]:pl-4 [&_blockquote]:italic",
             className,
           )}

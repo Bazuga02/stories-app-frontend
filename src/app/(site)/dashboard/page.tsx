@@ -296,7 +296,7 @@ export default function DashboardPage() {
   const displayName = user?.name ?? "Writer";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+    <div className="flex w-full flex-1 flex-col bg-editorial-surface md:flex-row">
       {/* Sidebar */}
       <aside className="z-40 flex w-full shrink-0 flex-col border-outline-variant/15 bg-surface-container-low md:sticky md:top-[4.75rem] md:h-[calc(100dvh-4.75rem)] md:w-64 md:border-r md:border-b-0 border-b py-6">
         <div className="mb-8 px-6">

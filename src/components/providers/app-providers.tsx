@@ -25,18 +25,17 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           position="top-center"
           closeButton
           offset={16}
+          gap={12}
           toastOptions={{
             classNames: {
               toast:
-                "group !items-start rounded-xl border border-outline-variant/30 bg-surface-container-lowest text-on-surface shadow-[var(--shadow-card)] !py-3.5 !px-4 !pr-10",
-              title: "font-headline text-sm font-bold text-on-surface",
+                "stories-toast group !items-start !w-[min(calc(100vw-2rem),24rem)] rounded-2xl !py-4 !px-4 !pr-11",
+              title:
+                "stories-toast-title font-headline text-sm font-bold leading-snug",
               description:
-                "font-login-body text-sm leading-relaxed text-on-secondary-container",
+                "stories-toast-description font-login-body mt-0.5 text-sm leading-relaxed",
               closeButton:
-                "!left-auto !right-2 !top-3 !transform-none !size-7 !rounded-full !border !border-outline-variant/40 !bg-surface-container-high !text-on-surface transition-colors hover:!border-primary/30 hover:!bg-primary/10 hover:!text-primary",
-              info: "!border-primary/25 !bg-primary/5",
-              success: "!border-primary/20",
-              error: "!border-error/30 !bg-error-container/20",
+                "stories-toast-close !left-auto !right-2.5 !top-3 !transform-none !size-7 !rounded-full !border transition-colors",
             },
           }}
         />

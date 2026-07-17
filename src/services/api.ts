@@ -126,6 +126,30 @@ api.interceptors.response.use(
   },
 );
 
+function messageFromStatus(status: number | undefined, fallback: string): string {
+  switch (status) {
+    case 400:
+      return "That request wasn’t valid. Please check and try again.";
+    case 401:
+      return "Please sign in to continue.";
+    case 403:
+      return "You don’t have permission to do that.";
+    case 404:
+      return "We couldn’t find what you’re looking for.";
+    case 408:
+      return "The request timed out. Please try again.";
+    case 429:
+      return "Too many requests. Please wait a moment and try again.";
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return "Something went wrong on our side. Please try again in a moment.";
+    default:
+      return fallback;
+  }
+}
+
 export function getApiErrorMessage(err: unknown, fallback = "Something went wrong") {
   if (axios.isAxiosError<ApiErrorBody>(err)) {
     if (isBackendWakingUpError(err)) {
@@ -133,13 +157,25 @@ export function getApiErrorMessage(err: unknown, fallback = "Something went wron
     }
     const data = err.response?.data;
     const msg = data?.message;
-    if (typeof msg === "string") return msg;
-    if (Array.isArray(msg)) return msg.join(", ");
-    if (Array.isArray(data?.details)) return data.details.join(", ");
-    if (typeof data?.error === "string") return data.error;
-    if (err.message) return err.message;
+    if (typeof msg === "string" && msg.trim()) return msg;
+    if (Array.isArray(msg) && msg.length) return msg.join(", ");
+    if (Array.isArray(data?.details) && data.details.length) {
+      return data.details.join(", ");
+    }
+    if (typeof data?.error === "string" && data.error.trim()) return data.error;
+
+    const status = err.response?.status;
+    if (status) return messageFromStatus(status, fallback);
+
+    if (err.message && !/^Request failed with status code \d+$/i.test(err.message)) {
+      return err.message;
+    }
   }
-  if (err instanceof Error) return err.message;
+  if (err instanceof Error) {
+    if (!/^Request failed with status code \d+$/i.test(err.message)) {
+      return err.message;
+    }
+  }
   return fallback;
 }
 

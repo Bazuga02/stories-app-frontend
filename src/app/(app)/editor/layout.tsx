@@ -10,9 +10,5 @@ export default function EditorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthGuard>
-      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-    </AuthGuard>
-  );
+  return <AuthGuard>{children}</AuthGuard>;
 }

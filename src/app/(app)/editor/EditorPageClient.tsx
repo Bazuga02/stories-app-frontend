@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -29,6 +28,7 @@ import {
   EDITOR_TIP_IMAGE,
   pickRandomEditorTip,
 } from "@/lib/editor-tips";
+import { useEditorChromeStore } from "@/store/editorChromeStore";
 
 const schema = z.object({
   title: z.string().max(200),
@@ -75,8 +75,7 @@ export function EditorPageClient() {
   const existingId = searchParams.get("id");
   const [storyId, setStoryId] = useState<string | null>(existingId);
   const [initializing, setInitializing] = useState(true);
-  const [publishing, setPublishing] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const saving = useEditorChromeStore((s) => s.saving);
   const [savedSnapshot, setSavedSnapshot] = useState<{
     title: string;
     content: string;
@@ -224,16 +223,16 @@ export function EditorPageClient() {
   };
 
   const saveDraftNow = handleSubmit(async (data) => {
-    setSaving(true);
+    useEditorChromeStore.getState().setBusy({ saving: true });
     try {
       await persistDraft(data);
     } finally {
-      setSaving(false);
+      useEditorChromeStore.getState().setBusy({ saving: false });
     }
   });
 
   const onPublish = handleSubmit(async (data) => {
-    setPublishing(true);
+    useEditorChromeStore.getState().setBusy({ publishing: true });
     try {
       const cover = bgimg?.trim() || null;
       let id = storyId;
@@ -280,9 +279,23 @@ export function EditorPageClient() {
         }
       }
     } finally {
-      setPublishing(false);
+      useEditorChromeStore.getState().setBusy({ publishing: false });
     }
   });
+
+  const saveDraftNowRef = useRef(saveDraftNow);
+  const onPublishRef = useRef(onPublish);
+  saveDraftNowRef.current = saveDraftNow;
+  onPublishRef.current = onPublish;
+
+  useEffect(() => {
+    const { register, clear } = useEditorChromeStore.getState();
+    register({
+      saveDraft: () => void saveDraftNowRef.current(),
+      publish: () => void onPublishRef.current(),
+    });
+    return () => clear();
+  }, []);
 
   const navigateAfterLeave = useCallback(
     (href: string) => {
@@ -312,12 +325,12 @@ export function EditorPageClient() {
     const target = pendingHref;
     if (!target) return;
     const data = getValues();
-    setSaving(true);
+    useEditorChromeStore.getState().setBusy({ saving: true });
     try {
       const ok = await persistDraft(data);
       if (ok) navigateAfterLeave(target);
     } finally {
-      setSaving(false);
+      useEditorChromeStore.getState().setBusy({ saving: false });
     }
   };
 
@@ -347,48 +360,7 @@ export function EditorPageClient() {
 
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 shrink-0 border-b border-outline-variant/10 bg-editorial-surface">
-          <nav className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-4">
-            <div className="flex flex-wrap items-center gap-4 md:gap-8">
-              <Link
-                href="/"
-                className="font-headline text-2xl font-black tracking-tighter text-primary sm:text-3xl"
-              >
-                Stories
-              </Link>
-              <Link
-                href="/"
-                className="font-headline text-base font-bold text-primary transition-colors hover:text-primary/85 lg:text-lg"
-              >
-                Explore
-              </Link>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              <span className="rounded-full bg-surface-container-high px-3 py-1 text-xs font-bold tracking-wider text-on-surface-variant">
-                Draft
-              </span>
-              <button
-                type="button"
-                disabled={saving}
-                className="font-headline text-base font-bold text-black transition-transform hover:text-primary active:scale-95 disabled:opacity-50 lg:text-lg"
-                onClick={() => void saveDraftNow()}
-              >
-                {saving ? "Saving…" : "Save Draft"}
-              </button>
-              <button
-                type="button"
-                disabled={publishing}
-                className="scale-95 rounded-full bg-primary px-5 py-2 font-headline text-base font-bold text-on-primary transition-all hover:bg-primary-container active:scale-90 disabled:opacity-60 lg:px-6 lg:text-lg"
-                onClick={() => void onPublish()}
-              >
-                {publishing ? "Publishing…" : "Publish"}
-              </button>
-            </div>
-          </nav>
-        </header>
-
-        <main className="hide-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+      <main className="relative w-full flex-1 bg-editorial-surface">
           <div className="pointer-events-none fixed top-20 right-[5%] -z-10 opacity-20">
             <PenLine className="size-24 text-tertiary-fixed-dim sm:size-[120px]" strokeWidth={0.75} />
           </div>
@@ -503,7 +475,6 @@ export function EditorPageClient() {
               </div>
             </article>
           </div>
-        </main>
 
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 px-4 sm:bottom-8">
           <div className="glass-editor-toolbar pointer-events-auto flex items-center gap-0.5 rounded-full border border-outline-variant/20 p-2 shadow-xl md:gap-1">
@@ -516,7 +487,7 @@ export function EditorPageClient() {
             />
           </div>
         </div>
-      </div>
+      </main>
 
       <Modal
         open={coverPickerOpen}

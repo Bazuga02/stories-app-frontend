@@ -182,9 +182,9 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-0 flex-1">
+    <div className="flex w-full flex-1 bg-editorial-surface">
       {/* Sidebar */}
-      <aside className="flex h-full w-64 shrink-0 flex-col border-r border-outline-variant/15 bg-surface-container-low py-6 dark:bg-on-background dark:text-inverse-on-surface">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-outline-variant/15 bg-surface-container-low py-6 dark:bg-on-background dark:text-inverse-on-surface">
         <div className="mb-8 px-6">
           <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
           <p className="text-on-secondary-container text-xs opacity-70">Manage your narrative</p>
@@ -235,7 +235,7 @@ export function AdminDashboard() {
       </aside>
 
       {/* Main */}
-      <main className="relative min-h-0 flex-1 overflow-y-auto hide-scrollbar">
+      <main className="relative flex-1">
         <div className="pointer-events-none absolute top-0 right-0 -z-10 p-8 opacity-20 sm:p-12">
           <Star className="size-24 fill-tertiary-fixed-dim text-tertiary-fixed-dim sm:size-[120px]" strokeWidth={0} />
         </div>
