@@ -14,6 +14,8 @@ type ModalProps = {
   className?: string;
   /** Editorial story-style panel (cream surface, Epilogue title). Default keeps white card. */
   variant?: "default" | "editorial";
+  /** Tighter padding and title for small tool panels (e.g. listen player). */
+  compact?: boolean;
 };
 
 export function Modal({
@@ -23,6 +25,7 @@ export function Modal({
   children,
   className,
   variant = "default",
+  compact = false,
 }: ModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -64,24 +67,33 @@ export function Modal({
       />
       <div
         className={cn(
-          "relative z-10 w-full max-w-lg",
+          "relative z-10 w-full",
+          compact ? "max-w-sm" : "max-w-lg",
           variant === "editorial"
-            ? "rounded-[2rem] border border-outline-variant/15 bg-surface-container-low p-6 font-login-body text-on-background editorial-shadow sm:p-8"
+            ? cn(
+                "border border-outline-variant/15 bg-surface-container-low font-login-body text-on-background editorial-shadow",
+                compact
+                  ? "rounded-2xl p-4 sm:p-5"
+                  : "rounded-[2rem] p-6 sm:p-8",
+              )
             : "rounded-[var(--radius-lg)] bg-white p-[var(--spacing-lg)] shadow-[var(--shadow-floating)]",
           className,
         )}
       >
         <div
           className={cn(
-            "flex items-start justify-between gap-4",
-            variant === "editorial" ? "mb-6" : "mb-[var(--spacing-md)]",
+            "flex items-start justify-between gap-3",
+            compact ? "mb-3" : variant === "editorial" ? "mb-6" : "mb-[var(--spacing-md)]",
           )}
         >
           <h2
             id="modal-title"
             className={cn(
               variant === "editorial"
-                ? "font-headline text-2xl font-black tracking-tighter text-on-background sm:text-3xl"
+                ? cn(
+                    "font-headline font-black tracking-tighter text-on-background",
+                    compact ? "text-lg sm:text-xl" : "text-2xl sm:text-3xl",
+                  )
                 : "text-section-heading text-[1.25rem]",
             )}
           >
@@ -91,10 +103,13 @@ export function Modal({
             <button
               type="button"
               onClick={onClose}
-              className="flex shrink-0 items-center justify-center rounded-full p-2 text-on-secondary-container transition-colors hover:bg-surface-container-high hover:text-on-background"
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-full text-on-secondary-container transition-colors hover:bg-surface-container-high hover:text-on-background",
+                compact ? "p-1.5" : "p-2",
+              )}
               aria-label="Close"
             >
-              <X className="size-5" strokeWidth={2} />
+              <X className={compact ? "size-4" : "size-5"} strokeWidth={2} />
             </button>
           ) : (
             <Button
