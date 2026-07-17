@@ -8,6 +8,7 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
+import DOMPurify from "dompurify";
 import { marked } from "marked";
 import TurndownService from "turndown";
 import { cn } from "@/lib/cn";
@@ -40,7 +41,7 @@ type Props = {
 function mdToHtml(md: string): string {
   if (!md.trim()) return "";
   const out = marked.parse(md, { async: false });
-  return typeof out === "string" ? out : String(out);
+  return DOMPurify.sanitize(typeof out === "string" ? out : String(out), { USE_PROFILES: { html: true } });
 }
 
 export const RichMarkdownEditor = forwardRef<RichMarkdownEditorHandle, Props>(
@@ -114,6 +115,12 @@ export const RichMarkdownEditor = forwardRef<RichMarkdownEditorHandle, Props>(
           data-placeholder={placeholder ?? ""}
           onInput={flush}
           onBlur={flush}
+          onPaste={(event) => {
+            event.preventDefault();
+            const text = event.clipboardData.getData("text/plain");
+            document.execCommand("insertText", false, text);
+            queueMicrotask(flush);
+          }}
         />
       </div>
     );

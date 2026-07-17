@@ -12,7 +12,6 @@ export type StoryStatus = "DRAFT" | "PUBLISHED";
 export interface StoryAuthor {
   id: string;
   name: string;
-  email?: string;
 }
 
 export interface Story {

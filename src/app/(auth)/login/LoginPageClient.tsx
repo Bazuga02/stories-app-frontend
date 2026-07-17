@@ -21,10 +21,16 @@ const schema = z.object({
 });
 
 type Form = z.infer<typeof schema>;
+function safeInternalPath(value: string | null): string {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
+    return "/";
+  }
+  return value;
+}
 
 export function LoginPageClient() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/";
+  const next = safeInternalPath(searchParams.get("next"));
   const setAuth = useAuthStore((s) => s.setAuth);
   const [showPassword, setShowPassword] = useState(false);
 
